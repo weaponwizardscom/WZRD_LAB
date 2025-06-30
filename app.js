@@ -18,6 +18,8 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     const bgBtn=$("bg-btn"),saveBtn=$("save-btn"),resetBtn=$("reset-btn");
     const sendBtn=$("send-btn"),modal=$("modal"),mSend=$("m-send"),mCancel=$("m-cancel"),
           mName=$("m-name"),mMail=$("m-mail"),mPhone=$("m-phone");
+    let popperInstance;
+
     const langPl=$("pl"),langEn=$("en"),hParts=$("h-parts"),hCol=$("h-col"),
           modalTitle=$("modal-title"),modalNote=$("modal-note");
     
@@ -155,7 +157,15 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();buildUI();addModelListeners();// defaultBlack() disabled as per user request
+    (async()=>{await preloadBGs();buildUI();
+      /* === Popper overlay === */
+      const overlayEl = document.getElementById("action-overlay");
+      popperInstance = Popper.createPopper(gunBox, overlayEl,{
+        placement:"bottom-end",
+        modifiers:[{name:"offset",options:{offset:[0,10]}}]
+      });
+      window.addEventListener("resize", ()=>popperInstance.update());
+addModelListeners();// defaultBlack() disabled as per user request
   changeBg();})();
     
     /* preload BG */
@@ -309,7 +319,7 @@ function chooseModel(model){
   const overlay=document.getElementById("model-select");
   if(overlay)overlay.classList.add("hidden");
   currentSvg=MODELS[model]||"g17.svg";
-  if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();loadSvg();
+  if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();document.getElementById("action-overlay").classList.remove("hidden");loadSvg();
 }
 
     async function sendMail(){
