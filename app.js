@@ -1,3 +1,14 @@
+
+/* === OVERLAY CREATOR === */
+function createOverlay(){
+  const ov = document.createElement("div");
+  ov.id = "action-overlay";
+  ov.className = "action-overlay hidden";
+  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn">Zmień Tło</button>' +
+                 '<button id="save-overlay" class="overlay-btn">Zapisz Obraz</button>';
+  return ov;
+}
+const overlay = createOverlay();
 document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
@@ -155,7 +166,12 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();buildUI();addModelListeners();// defaultBlack() disabled as per user request
+    (async()=>{await preloadBGs();buildUI();
+// overlay mapping
+document.getElementById("gun-view").appendChild(overlay);
+overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
+overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
+addModelListeners();// defaultBlack() disabled as per user request
   changeBg();})();
     
     /* preload BG */
@@ -164,9 +180,7 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
-      const overlayEl=document.getElementById("action-overlay");
-      gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
-      if(overlayEl) gunBox.appendChild(overlayEl);
+      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{

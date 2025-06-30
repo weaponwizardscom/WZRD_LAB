@@ -113,30 +113,29 @@
 .model-btn:hover{background:#444;transform:scale(1.05);}
 
 
-/* --- Overlay action buttons --- */
-.action-overlay{
-  position:absolute;
-  right:10px;
-  bottom:10px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  z-index:30;
-}
-.overlay-btn{
-  padding:4px 8px;
-  font-size:12px;
-  line-height:1.1;
-  color:#fff;
-  background:rgba(0,0,0,.55);
-  border:1px solid #fff3;
-  border-radius:4px;
-  cursor:pointer;
-  backdrop-filter: blur(4px);
-}
-.overlay-btn:hover{background:rgba(0,0,0,.75);}
-.hidden{display:none;}
-
+    /* --- Overlay action buttons --- */
+    .action-overlay{
+      position:absolute;
+      right:10px;
+      bottom:10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      z-index:30;
+    }
+    .overlay-btn{
+      padding:4px 8px;
+      font-size:12px;
+      line-height:1.1;
+      color:#fff;
+      background:rgba(0,0,0,.55);
+      border:1px solid #fff3;
+      border-radius:4px;
+      cursor:pointer;
+      backdrop-filter:blur(4px);
+    }
+    .overlay-btn:hover{background:rgba(0,0,0,.75);}
+    
 </style>
 </head>
 <body>
@@ -152,12 +151,6 @@
 </div>
 
         <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-<!-- Overlay action buttons -->
-<div id="action-overlay" class="action-overlay hidden" aria-hidden="true">
-  <button id="bg-overlay"   class="overlay-btn">Zmień Tło</button>
-  <button id="save-overlay" class="overlay-btn">Zapisz Obraz</button>
-</div>
-
       </div>
 
       <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
@@ -203,12 +196,6 @@
       <button id="m-send" class="btn blue" type="button" style="margin-top:6px">Wyślij</button>
       <button id="m-cancel" class="btn gray" type="button" style="margin-top:6px">Anuluj</button>
       <p class="note" id="modal-note">Po wysłaniu dołącz pobrany plik PNG.</p>
-<!-- Overlay action buttons -->
-<div id="action-overlay" class="action-overlay hidden" aria-hidden="true">
-  <button id="bg-overlay"   class="overlay-btn">Zmień Tło</button>
-  <button id="save-overlay" class="overlay-btn">Zapisz Obraz</button>
-</div>
-
     </div>
   </div>
 
@@ -240,17 +227,5 @@
       reorder();
     })();
   </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", ()=>{
-  const bgO=document.getElementById("bg-overlay");
-  const saveO=document.getElementById("save-overlay");
-  const bgBtn=document.getElementById("bg-btn");
-  const saveBtn=document.getElementById("save-btn");
-  if(bgO && bgBtn) bgO.addEventListener("click", ()=> bgBtn.click());
-  if(saveO && saveBtn) saveO.addEventListener("click", ()=> saveBtn.click());
-});
-</script>
-
 </body>
 </html>
