@@ -64,15 +64,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
   }
 
+  const promises=[];
   assets.forEach(src=>{
     if(src.endsWith(".svg")){
-      fetch(src).then(update).catch(update);
+      promises.push(fetch(src).catch(()=>{}).then(update));
     }else{
-      const i=new Image();
-      i.onload=update;i.onerror=update;i.src=src;
+      promises.push(new Promise(res=>{const i=new Image();
+      i.onload=()=>{update();res();};i.onerror=()=>{update();res();};i.src=src;}));
     }
+    });
+  Promise.allSettled(promises).then(()=>overlay.classList.add('hidden'));
   });
-});
+  Promise.allSettled(promises).then(()=>overlay.classList.add('hidden'));
 </script>
 </body>
 </html>
