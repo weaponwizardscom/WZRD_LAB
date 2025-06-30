@@ -77,7 +77,7 @@
     .parts button{padding:10px 6px; font-size:12px; font-weight:600; text-align:center; background:#f5f6f7; border:1px solid var(--border); border-radius:6px; cursor:pointer;}
     .parts button.selected{background:var(--pri); color:#fff;}
     .parts button.disabled{background:#444; color:#888; cursor:not-allowed;}
-    .mix{background:linear-gradient(45deg,#ffd700,#ff7a00,#ff007a,#00aaff,#00ff6a); color:#000; font-weight:700;}
+    .mix{background:linear-gradient(45deg,#ffd700,#ff7a00,#ff007a,#00aaff,#00ff6a); color:#fff; font-weight:700; transition:.2s;}
 
     .palette-wrap{max-height:400px; overflow-y:auto; padding-right:8px;}
     .palette{display:grid; grid-template-columns:repeat(3,1fr); gap:25px 10px;}
@@ -104,7 +104,8 @@
       #price{text-align:center;}
       #summary-list{column-count:2;}
     }
-  </style>
+    .mix:hover{filter:brightness(1.2);box-shadow:0 0 8px var(--pri);}
+    </style>
 </head>
 <body>
   <div class="configurator">
