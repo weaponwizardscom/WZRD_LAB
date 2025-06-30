@@ -131,8 +131,8 @@
       <!-- Action icons overlay -->
       
       <div class="action-overlay">
-        <button id="bg-btn" class="btn gray action-btn" title="Zmień tło">🖼️</button>
-        <button id="save-btn" class="btn blue action-btn" title="Zapisz obraz">💾</button>
+        <button id="bg-icon" class="btn gray action-btn" title="Zmień tło">🖼️</button>
+        <button id="save-icon" class="btn blue action-btn" title="Zapisz obraz">💾</button>
       </div>
 
 
@@ -144,7 +144,11 @@
 </div>
 
         <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      </div><!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
+      </div>
+      <button id="bg-btn" class="btn gray" type="button" style="display:none">Zmień Tło</button>
+      <button id="save-btn" class="btn blue" type="button" style="display:none">Zapisz Obraz</button>
+
+      <!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
       <div class="summary"><div id="summary-list"></div></div>
       <div id="price">Szacowany koszt:&nbsp;&nbsp;0&nbsp;zł</div>
       <button id="send-btn" class="btn red" type="button" style="margin-top:8px">Wyślij do Wizards!</button>
@@ -215,5 +219,17 @@
       reorder();
     })();
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const bgIcon=document.getElementById("bg-icon");
+  const saveIcon=document.getElementById("save-icon");
+  const hiddenBg=document.getElementById("bg-btn");
+  const hiddenSave=document.getElementById("save-btn");
+  if(bgIcon && hiddenBg) bgIcon.addEventListener("click", ()=>hiddenBg.click());
+  if(saveIcon && hiddenSave) saveIcon.addEventListener("click", ()=>hiddenSave.click());
+});
+</script>
 </body>
+
 </html>
