@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
-    const SVG_FILE="g17.svg";
+    let currentSvgFile="g17.svg";
+    const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
     const TEXTURE ="img/glock17.png";
     const BG      =["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();await loadSvg();buildUI();// defaultBlack() disabled as per user request
+    (async()=>{await preloadBGs();await // loadSvg deferred until model chosenbuildUI();// defaultBlack() disabled as per user request
   changeBg();})();
     
     /* preload BG */
@@ -160,7 +161,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     /* SVG */
     async function loadSvg(){
-      gunBox.innerHTML=await fetch(SVG_FILE).then(r=>r.text());
+      gunBox.innerHTML=await fetch(currentSvgFile).then(r=>r.text());
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
@@ -309,5 +310,17 @@ document.addEventListener("DOMContentLoaded",()=>{
       modal.classList.add("hidden");
     }
     
+    })
+/* Model select */
+function addModelListeners(){
+  document.querySelectorAll(".model-btn").forEach(btn=>{
+    btn.onclick=()=>chooseModel(btn.dataset.model);
+  });
+}
+function chooseModel(model){
+  currentSvgFile=MODELS[model]||"g17.svg";
+  loadSvg().then(()=>{document.getElementById("model-overlay").classList.add("hidden");});
+}
+
+    addModelListeners();
     });
-    
