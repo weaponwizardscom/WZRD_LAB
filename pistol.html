@@ -130,7 +130,7 @@
 
       <!-- Action icons overlay -->
       
-      <div class="action-overlay">
+      <div id="action-overlay" class="action-overlay hidden">
         <button id="bg-icon" class="btn gray action-btn" title="Zmień tło">🖼️</button>
         <button id="save-icon" class="btn blue action-btn" title="Zapisz obraz">💾</button>
       </div>
@@ -230,6 +230,18 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(saveIcon && hiddenSave) saveIcon.addEventListener("click", ()=>hiddenSave.click());
 });
 </script>
+
+<script id="icon-map">
+document.addEventListener("DOMContentLoaded",()=>{
+  const bgIcon=document.getElementById("bg-icon");
+  const saveIcon=document.getElementById("save-icon");
+  const hiddenBg=document.getElementById("bg-btn");
+  const hiddenSave=document.getElementById("save-btn");
+  if(bgIcon && hiddenBg) bgIcon.onclick=()=>hiddenBg.click();
+  if(saveIcon && hiddenSave) saveIcon.onclick=()=>hiddenSave.click();
+});
+</script>
+
 </body>
 
 </html>
