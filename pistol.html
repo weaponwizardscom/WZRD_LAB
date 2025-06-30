@@ -112,6 +112,14 @@
 .model-btn{padding:14px 24px;font-size:18px;font-weight:700;border:none;border-radius:8px;background:#222;color:#fff;cursor:pointer;transition:.25s;}
 .model-btn:hover{background:#444;transform:scale(1.05);}
 
+
+    /* Action overlay buttons */
+    .action-overlay{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:8px;z-index:20;}
+    .action-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+                border-radius:50%;font-size:22px;padding:0;line-height:1;background:#007bff}
+    .action-btn.gray{background:#6c757d;}
+    .action-btn:hover{filter:brightness(1.15);}
+
 </style>
 </head>
 <body>
@@ -119,6 +127,10 @@
     <!-- LEWA KOLUMNA -------------------------------------------------->
     <div class="gun-wrap">
       <div id="gun-view" class="gun-view" aria-live="polite">
+
+      <!-- Action icons overlay -->
+      <div class="action-overlay"></div>
+
 <!-- overlay producentów -->
 <div id="model-select" class="model-select">
   <button class="model-btn" data-model="glock">Glock</button>
@@ -127,12 +139,7 @@
 </div>
 
         <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      </div>
-
-      <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
-      <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
-
-      <!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
+      </div><!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
       <div class="summary"><div id="summary-list"></div></div>
       <div id="price">Szacowany koszt:&nbsp;&nbsp;0&nbsp;zł</div>
       <button id="send-btn" class="btn red" type="button" style="margin-top:8px">Wyślij do Wizards!</button>
