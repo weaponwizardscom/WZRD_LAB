@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
-    const SVG_FILE="g17.svg";
+    let currentSvg=null;
     const TEXTURE ="img/glock17.png";
-    const BG      =["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
+    const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
+const BG      =["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     
     const PRICE={zamek:400,szkielet:400,spust:150,lufa:200,zerdz:50,pazur:50,
                  zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:150}; // płytka = 0
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();await loadSvg();buildUI();// defaultBlack() disabled as per user request
+    (async()=>{await preloadBGs();buildUI();addModelListeners();// defaultBlack() disabled as per user request
   changeBg();})();
     
     /* preload BG */
@@ -160,7 +161,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     /* SVG */
     async function loadSvg(){
-      gunBox.innerHTML=await fetch(SVG_FILE).then(r=>r.text());
+      if(!currentSvg)return;
+      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
@@ -295,6 +297,19 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     
     /* mailto */
+/* Model select */
+function addModelListeners(){
+  document.querySelectorAll(".model-btn").forEach(btn=>{
+     btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
+  });
+}
+function chooseModel(model){
+  const overlay=document.getElementById("model-select");
+  if(overlay)overlay.classList.add("hidden");
+  currentSvg=MODELS[model]||"g17.svg";
+  loadSvg();
+}
+
     async function sendMail(){
       const name=mName.value.trim(),mail=mMail.value.trim(),tel=mPhone.value.trim();
       if(!name||!mail){alert(lang==="pl"?"Podaj imię i e-mail":"Please provide name and email");return;}
