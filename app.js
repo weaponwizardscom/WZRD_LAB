@@ -36,25 +36,92 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     const COLORS={/* skrócone tutaj (pełna lista jak w index) */}
     Object.assign(COLORS,{
-     "H-140 Bright White":"#FFFFFF","H-242 Hidden White":"#E5E4E2","H-136 Snow White":"#F5F5F5",
-     "H-297 Stormtrooper White":"#F2F2F2","H-300 Armor Clear":"#F5F5F5","H-331 Parakeet Green":"#C2D94B",
-     "H-141 Prison Pink":"#E55C9C","H-306 Springfield Grey":"#A2A4A6","H-312 Frost":"#C9C8C6",
-     "H-214 S&W Grey":"#8D918D","H-265 Cold War Grey":"#999B9E","H-227 Tactical Grey":"#8D8A82",
-     "H-170 Titanium":"#7A7A7A","H-130 Combat Grey":"#6A6A6A","H-237 Tungsten":"#6E7176",
-     "H-210 Sig Dark Grey":"#5B5E5E","H-234 Sniper Grey":"#5B6063","H-342 Smoke":"#84888B",
-     "H-321 Blush":"#D8C0C4","H-213 Battleship Grey":"#52595D","H-146 Graphite Black":"#3B3B3B",
-     "H-190 Armor Black":"#212121","H-142 Light Sand":"#D2C3A8","H-199 Desert Sand":"#C5BBAA",
-     "H-267 Magpul FDE":"#A48F6A","H-269 Barrett Brown":"#67594D","H-148 Burnt Bronze":"#8C6A48",
-     "H-339 Federal Brown":"#5E5044","H-8000 RAL 8000":"#937750","H-33446 FS Sabre Sand":"#B19672",
-     "H-240 Mil Spec O.D. Green":"#5F604F","H-247 Desert Sage":"#6A6B5C","H-229 Sniper Green":"#565A4B",
-     "H-344 Olive":"#6B6543","H-189 Noveske Bazooka Green":"#6C6B4E","H-353 Island Green":"#00887A",
-     "H-127 Kel-Tec Navy Blue":"#2B3C4B","H-171 NRA Blue":"#00387B","H-188 Stealth Grey":"#5C6670",
-     "H-256 Cobalt":"#395173","H-258 Socom Blue":"#3B4B5A","H-329 Blue Raspberry":"#0077C0",
-     "H-362 Patriot Blue":"#33415C","H-197 Wild Purple":"#5A3A54","H-217 Bright Purple":"#8A2BE2",
-     "H-332 Purplexed":"#6C4E7C","H-357 Periwinkle":"#6B6EA6","H-128 Hunter Orange":"#F26522",
-     "H-167 USMC Red":"#9E2B2F","H-216 S&W Red":"#B70101","H-221 Crimson":"#891F2B",
-     "H-317 Sunflower":"#F9A602","H-354 Lemon Zest":"#F7D51D","H-122 Gold":"#B79436",
-     "H-151 Satin Aluminum":"#C0C0C0"
+     // BIAŁE / SZARE / CZARNE
+    "H-140 Bright White": "#FFFFFF",
+    "H-136 Snow White": "#F5F5F5",
+    "H-297 Stormtrooper White": "#F2F2F2",
+    "H-242 Hidden White": "#E5E4E2",
+    "H-312 Frost": "#C9C8C6",
+    "H-306 Springfield Grey": "#A2A4A6",
+    "H-265 Cold War Grey": "#999B9E",
+    "H-214 S&W Grey": "#8D918D",
+    "H-342 Smoke": "#84888B",
+    "H-227 Tactical Grey": "#8D8A82",
+    "H-170 Titanium": "#7A7A7A",
+    "H-237 Tungsten": "#6E7176",
+    "H-130 Combat Grey": "#6A6A6A",
+    "H-210 Sig Dark Grey": "#5B5E5E",
+    "H-234 Sniper Grey": "#5B6063",
+    "H-213 Battleship Grey": "#52595D",
+    "H-146 Graphite Black": "#3B3B3B",
+    "H-190 Armor Black": "#212121",
+    "H-235 Socom Black": "#1C1C1C",
+    "H-294 Midnight Black": "#111111",
+
+    // BRĄZY / PIASKOWE
+    "H-142 Light Sand": "#D2C3A8",
+    "H-199 Desert Sand": "#C5BBAA",
+    "H-33446 FS Sabre Sand": "#B19672",
+    "H-267 Magpul FDE": "#A48F6A",
+    "H-8000 RAL 8000": "#937750",
+    "H-250 A.I. Dark Earth": "#7D6A54",
+    "H-148 Burnt Bronze": "#8C6A48",
+    "H-269 Barrett Brown": "#67594D",
+    "H-346 McMillan Tan": "#6A5E4E",
+    "H-339 Federal Brown": "#5E5044",
+    "H-226 Patriot Brown": "#4B443D",
+    "H-224 SIG Pink": "#E6C9C4", // Często klasyfikowany jako różowy, ale bliski odcieniom "cielistym"
+    "H-321 Blush": "#D8C0C4",
+
+    // ZIELENIE
+    "H-331 Parakeet Green": "#C2D94B",
+    "H-247 Desert Sage": "#6A6B5C",
+    "H-240 Mil Spec O.D. Green": "#5F604F",
+    "H-229 Sniper Green": "#565A4B",
+    "H-189 Noveske Bazooka Green": "#6C6B4E",
+    "H-344 Olive": "#6B6543",
+    "H-232 Magpul O.D. Green": "#5A5B4C",
+    "H-268 Troy Coyote Tan": "#7B6A4C", // Nazwa myląca, w rzeczywistości to zielono-brązowy odcień
+    "H-353 Island Green": "#00887A",
+    "H-204 Milspec Green": "#4E5444",
+
+    // NIEBIESKIE
+    "H-171 NRA Blue": "#00387B",
+    "H-329 Blue Raspberry": "#0077C0",
+    "H-256 Cobalt": "#395173",
+    "H-362 Patriot Blue": "#33415C",
+    "H-258 Socom Blue": "#3B4B5A",
+    "H-127 Kel-Tec Navy Blue": "#2B3C4B",
+    "H-188 Stealth Grey": "#5C6670", // Bardzo ciemny niebiesko-szary
+    "H-327 Tiffany Blue": "#71CEC7",
+
+    // RÓŻOWE / FIOLETOWE
+    "H-141 Prison Pink": "#E55C9C",
+    "H-357 Periwinkle": "#6B6EA6",
+    "H-332 Purplexed": "#6C4E7C",
+    "H-197 Wild Purple": "#5A3A54",
+    "H-217 Bright Purple": "#8A2BE2",
+
+    // CZERWONE / POMARAŃCZOWE / ŻÓŁTE
+    "H-167 USMC Red": "#9E2B2F",
+    "H-221 Crimson": "#891F2B",
+    "H-216 S&W Red": "#B70101",
+    "H-128 Hunter Orange": "#F26522",
+    "H-168 Zombie Green": "#A3B93A", // Bardziej żółto-zielony, ale często w tej kategorii
+    "H-317 Sunflower": "#F9A602",
+    "H-354 Lemon Zest": "#F7D51D",
+    "H-122 Gold": "#B79436",
+
+    // METALICZNE / BEZBARWNE
+    "H-151 Satin Aluminum": "#C0C0C0",
+    "H-301 Matte Armor Clear": "#F5F5F5", // Efekt matowy, wizualnie zbliżony do bieli
+    "H-300 Armor Clear": "#F5F5F5", // Efekt satynowy, wizualnie zbliżony do bieli
+    "H-310 Matte Ceramic Clear": "#F5F5F5", // Podobnie jak wyżej
+    "H-152 Satin Nickel": "#B4B5B1",
+    "H-215 Bright Nickel": "#D0D0D0",
+    "H-157-Q Stainless": "#A9A9A9",
+    "H-328-Q Burnt Steel": "#757271",
+    "H-349-Q Copper": "#C5724B"
     });
     
     /* === STAN === */
