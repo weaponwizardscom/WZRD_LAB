@@ -310,7 +310,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       modal.classList.add("hidden");
     }
     
-    })
 /* Model select */
 function addModelListeners(){
   document.querySelectorAll(".model-btn").forEach(btn=>{
