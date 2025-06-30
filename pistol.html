@@ -133,13 +133,13 @@
   <button class="model-btn" data-model="sig">SIG</button>
   <button class="model-btn" data-model="cz">CZ</button>
 </div>
-
-        <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      
       <div id="action-overlay" class="action-overlay hidden">
-        <button id="bg-icon"   class="overlay-btn gray" type="button">Zmień<br>Tło</button>
+        <button id="bg-icon" class="overlay-btn gray" type="button">Zmień<br>Tło</button>
         <button id="save-icon" class="overlay-btn blue" type="button">Zapisz<br>Obraz</button>
       </div>
+
+
+        <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
 
 
       <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
@@ -225,6 +225,18 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const saveBtn=document.getElementById("save-btn");
   if(bgIcon && bgBtn) bgIcon.addEventListener("click", ()=>bgBtn.click());
   if(saveIcon && saveBtn) saveIcon.addEventListener("click", ()=>saveBtn.click());
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const bgI=document.getElementById('bg-icon');
+  const svI=document.getElementById('save-icon');
+  const bgBtn=document.getElementById('bg-btn');
+  const svBtn=document.getElementById('save-btn');
+  if(bgI && bgBtn) bgI.addEventListener('click', ()=>bgBtn.click());
+  if(svI && svBtn) svI.addEventListener('click', ()=>svBtn.click());
 });
 </script>
 

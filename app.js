@@ -310,6 +310,7 @@ function chooseModel(model){
   if(overlay)overlay.classList.add("hidden");
   currentSvg=MODELS[model]||"g17.svg";
   if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();document.getElementById("action-overlay").classList.remove("hidden");
+  document.getElementById("action-overlay").classList.remove("hidden");
   loadSvg();
 }
 
