@@ -310,16 +310,21 @@ document.addEventListener("DOMContentLoaded",()=>{
       modal.classList.add("hidden");
     }
     
+    })
 /* Model select */
 function addModelListeners(){
   document.querySelectorAll(".model-btn").forEach(btn=>{
     btn.onclick=()=>chooseModel(btn.dataset.model);
   });
 }
+
 function chooseModel(model){
+  const overlay=document.getElementById("model-overlay");
+  if(overlay)overlay.classList.add("hidden");
   currentSvgFile=MODELS[model]||"g17.svg";
-  loadSvg().then(()=>{document.getElementById("model-overlay").classList.add("hidden");});
+  loadSvg();
 }
+
 
     addModelListeners();
     });
