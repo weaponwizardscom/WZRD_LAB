@@ -36,92 +36,116 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     const COLORS={/* skrócone tutaj (pełna lista jak w index) */}
     Object.assign(COLORS,{
-     // BIAŁE / SZARE / CZARNE
     "H-140 Bright White": "#FFFFFF",
     "H-136 Snow White": "#F5F5F5",
     "H-297 Stormtrooper White": "#F2F2F2",
     "H-242 Hidden White": "#E5E4E2",
     "H-312 Frost": "#C9C8C6",
+    "H-151 Satin Aluminum": "#C0C0C0",
+    "H-255 Crushed Silver": "#BDBFC1",
+    "H-158 Shimmer Aluminum": "#B6B6B4",
+    "H-152 Stainless": "#A9A9A9",
+    "H-150 Savage Stainless": "#A3A3A3",
     "H-306 Springfield Grey": "#A2A4A6",
+    "H-262 Stone Grey": "#A0A0A0",
     "H-265 Cold War Grey": "#999B9E",
-    "H-214 S&W Grey": "#8D918D",
-    "H-342 Smoke": "#84888B",
+    "H-184 Glock Grey": "#919396",
+    "H-214 S&W Grey": "#8D918D", // Znany też jako Bull Shark Grey
     "H-227 Tactical Grey": "#8D8A82",
+    "H-342 Smoke": "#84888B",
     "H-170 Titanium": "#7A7A7A",
+    "H-147 Satin Mag": "#7A7A7A",
     "H-237 Tungsten": "#6E7176",
     "H-130 Combat Grey": "#6A6A6A",
+    "H-188 Magpul Stealth Grey": "#5C6670",
     "H-210 Sig Dark Grey": "#5B5E5E",
     "H-234 Sniper Grey": "#5B6063",
     "H-213 Battleship Grey": "#52595D",
+    "H-219 Gun Metal Grey": "#58595B",
+    "H-139 Steel Grey": "#54585A",
+
+    // === CZARNE ===
     "H-146 Graphite Black": "#3B3B3B",
     "H-190 Armor Black": "#212121",
+    "H-238 Midnight Blue": "#1E232B", // Bardzo ciemny granat, prawie czarny
     "H-235 Socom Black": "#1C1C1C",
+    "H-109 Gloss Black": "#101010",
     "H-294 Midnight Black": "#111111",
 
-    // BRĄZY / PIASKOWE
+    // === BRĄZY / BEŻE / PIASKOWE ===
     "H-142 Light Sand": "#D2C3A8",
+    "H-143 Benelli Sand": "#D1C6B4",
     "H-199 Desert Sand": "#C5BBAA",
     "H-33446 FS Sabre Sand": "#B19672",
     "H-267 Magpul FDE": "#A48F6A",
+    "H-261 Glock FDE": "#A18A6E",
+    "H-265 Flat Dark Earth": "#7A6D5A", // Na liście był też Cold War Grey z tym H-xxx, to jest poprawny FDE
     "H-8000 RAL 8000": "#937750",
+    "H-235 Coyote Tan": "#8A7968", // Na liście był też Socom Black z tym H-xxx, to jest poprawny Coyote Tan
     "H-250 A.I. Dark Earth": "#7D6A54",
+    "H-30372 FS Brown Sand": "#7B6F63",
+    "H-268 Troy Coyote Tan": "#7B6A4C",
     "H-148 Burnt Bronze": "#8C6A48",
-    "H-269 Barrett Brown": "#67594D",
-    "H-346 McMillan Tan": "#6A5E4E",
-    "H-339 Federal Brown": "#5E5044",
+    "H-293 Vortex Bronze": "#7E6650",
+    "H-259 Barrett Bronze": "#715B4C",
     "H-226 Patriot Brown": "#4B443D",
-    "H-224 SIG Pink": "#E6C9C4", // Często klasyfikowany jako różowy, ale bliski odcieniom "cielistym"
-    "H-321 Blush": "#D8C0C4",
+    "H-269 Barrett Brown": "#67594D",
+    "H-258 Chocolate Brown": "#5C4B43",
+    "H-339 Federal Brown": "#5E5044",
+    "H-212 Federal Brown": "#4A403A", // Inna wersja
 
-    // ZIELENIE
+    // === ZIELENIE ===
+    "H-168 Zombie Green": "#A3B93A",
     "H-331 Parakeet Green": "#C2D94B",
     "H-247 Desert Sage": "#6A6B5C",
+    "H-231 Magpul Foliage Green": "#6C7164",
     "H-240 Mil Spec O.D. Green": "#5F604F",
+    "H-232 Magpul O.D. Green": "#5A5B4C",
+    "H-236 O.D. Green": "#57594B",
     "H-229 Sniper Green": "#565A4B",
+    "H-264 Mil Spec Green": "#50544A",
     "H-189 Noveske Bazooka Green": "#6C6B4E",
     "H-344 Olive": "#6B6543",
-    "H-232 Magpul O.D. Green": "#5A5B4C",
-    "H-268 Troy Coyote Tan": "#7B6A4C", // Nazwa myląca, w rzeczywistości to zielono-brązowy odcień
+    "H-200 Highland Green": "#4B5344",
+    "H-248 Forest Green": "#404C3D",
     "H-353 Island Green": "#00887A",
-    "H-204 Milspec Green": "#4E5444",
+    "H-316 Squatch Green": "#006A4E",
 
-    // NIEBIESKIE
-    "H-171 NRA Blue": "#00387B",
-    "H-329 Blue Raspberry": "#0077C0",
-    "H-256 Cobalt": "#395173",
-    "H-362 Patriot Blue": "#33415C",
-    "H-258 Socom Blue": "#3B4B5A",
-    "H-127 Kel-Tec Navy Blue": "#2B3C4B",
-    "H-188 Stealth Grey": "#5C6670", // Bardzo ciemny niebiesko-szary
+    // === NIEBIESKIE ===
+    "H-175 Robin's Egg Blue": "#78C5B9",
     "H-327 Tiffany Blue": "#71CEC7",
 
-    // RÓŻOWE / FIOLETOWE
-    "H-141 Prison Pink": "#E55C9C",
     "H-357 Periwinkle": "#6B6EA6",
+    "H-169 Sky Blue": "#5898D2",
+    "H-329 Blue Raspberry": "#0077C0",
+    "H-185 Blue Titanium": "#4A617A",
+    "H-256 Cobalt": "#395173", // W poprzedniej liście ten kod H był błędnie przypisany
+    "H-171 NRA Blue": "#00387B",
+    "H-362 Patriot Blue": "#33415C",
+    "H-258 Socom Blue": "#3B4B5A", // W poprzedniej liście ten kod H był błędnie przypisany
+    "H-127 Kel-Tec Navy Blue": "#2B3C4B",
+
+    // === RÓŻOWE / FIOLETOWE / CZERWONE ===
+    "H-224 Sig Pink": "#E6C9C4",
+    "H-321 Blush": "#D8C0C4",
+    "H-244 Bazooka Pink": "#F3AACB",
+    "H-141 Prison Pink": "#E55C9C",
+    "H-217 Bright Purple": "#8A2BE2",
     "H-332 Purplexed": "#6C4E7C",
     "H-197 Wild Purple": "#5A3A54",
-    "H-217 Bright Purple": "#8A2BE2",
-
-    // CZERWONE / POMARAŃCZOWE / ŻÓŁTE
     "H-167 USMC Red": "#9E2B2F",
     "H-221 Crimson": "#891F2B",
-    "H-216 S&W Red": "#B70101",
+    "H-216 S&W Red": "#B70101", // Znany też jako Firehouse Red
+
+    // === POMARAŃCZOWE / ŻÓŁTE / ZŁOTE ===
     "H-128 Hunter Orange": "#F26522",
-    "H-168 Zombie Green": "#A3B93A", // Bardziej żółto-zielony, ale często w tej kategorii
+    "H-322 Blood Orange": "#DE4A07",
     "H-317 Sunflower": "#F9A602",
     "H-354 Lemon Zest": "#F7D51D",
+    "H-144 Corvette Yellow": "#FDE135",
     "H-122 Gold": "#B79436",
+    "H-327 Rose Gold": "#D9A99A", // Ten sam H-xxx co Tiffany Blue, ale inna nazwa i wygląd
 
-    // METALICZNE / BEZBARWNE
-    "H-151 Satin Aluminum": "#C0C0C0",
-    "H-301 Matte Armor Clear": "#F5F5F5", // Efekt matowy, wizualnie zbliżony do bieli
-    "H-300 Armor Clear": "#F5F5F5", // Efekt satynowy, wizualnie zbliżony do bieli
-    "H-310 Matte Ceramic Clear": "#F5F5F5", // Podobnie jak wyżej
-    "H-152 Satin Nickel": "#B4B5B1",
-    "H-215 Bright Nickel": "#D0D0D0",
-    "H-157-Q Stainless": "#A9A9A9",
-    "H-328-Q Burnt Steel": "#757271",
-    "H-349-Q Copper": "#C5724B"
     });
     
     /* === STAN === */
