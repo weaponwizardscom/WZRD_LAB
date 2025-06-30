@@ -323,7 +323,4 @@ function chooseModel(model){
   currentSvgFile=MODELS[model]||"g17.svg";
   loadSvg();
 }
-
-
-    addModelListeners();
-    });
+});
