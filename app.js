@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();await loadSvg();buildUI();defaultBlack();changeBg();})();
+    (async()=>{await preloadBGs();await loadSvg();buildUI();// defaultBlack();  // removed per user requestchangeBg();})();
     
     /* preload BG */
     function preloadBGs(){BG.forEach(src=>{const i=new Image();i.src=src;});}
