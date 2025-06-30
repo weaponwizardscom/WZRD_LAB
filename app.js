@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     let currentSvg=null;
     const TEXTURE ="img/glock17.png";
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
-let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];  // default backgrounds
-const BG_DEFAULT = BG.slice();
+let BG      =["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
+const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
 const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     
     const PRICE={zamek:400,szkielet:400,spust:150,lufa:200,zerdz:50,pazur:50,
@@ -309,15 +309,7 @@ function chooseModel(model){
   const overlay=document.getElementById("model-select");
   if(overlay)overlay.classList.add("hidden");
   currentSvg=MODELS[model]||"g17.svg";
-  
-  if(model==="cz"){
-    BG = BG_CZ;
-  } else {
-    BG = BG_DEFAULT;
-  }
-  bgIdx = 0;
-  changeBg();
-loadSvg();
+  if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();loadSvg();
 }
 
     async function sendMail(){
