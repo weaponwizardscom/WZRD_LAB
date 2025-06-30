@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     const SVG_FILE="g17.svg";
     const TEXTURE ="img/glock17.png";
     let BG      =["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
+const BG_COMMON = BG.slice();
+const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
 const BG_CZ=["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     
     const PRICE={zamek:400,szkielet:400,spust:150,lufa:200,zerdz:50,pazur:50,
@@ -153,7 +155,7 @@ const BG_CZ=["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
-    (async()=>{await preloadBGs();await loadSvg();buildUI();defaultBlack();changeBg();})();
+    (async()=>{await preloadBGs();await loadSvg();buildUI();addModelListeners();defaultBlack();changeBg();})();
     
     /* preload BG */
     function preloadBGs(){BG.forEach(src=>{const i=new Image();i.src=src;});}
@@ -309,5 +311,30 @@ const BG_CZ=["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
       modal.classList.add("hidden");
     }
     
-    });
+    
+
+/* === MODEL SELECT === */
+function addModelListeners(){
+  document.querySelectorAll(".model-btn").forEach(b=>{
+    b.addEventListener("click",()=>chooseModel(b.dataset.model));
+  });
+}
+function chooseModel(model){
+  const overlay=document.getElementById("model-select");
+  if(overlay) overlay.classList.add("hidden");
+  currentSvg = MODELS[model] || MODELS.glock;
+  if(model==="cz"){
+    BG = BG_CZ;
+    TEXTURE = "img/cz1.png";
+  }else{
+    BG = BG_COMMON;
+    TEXTURE = "img/glock17.png";
+  }
+  bgIdx = 0;
+  changeBg();
+  loadSvg();
+  defaultBlack();
+}
+
+});
     
