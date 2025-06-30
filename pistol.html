@@ -112,6 +112,14 @@
 .model-btn{padding:14px 24px;font-size:18px;font-weight:700;border:none;border-radius:8px;background:#222;color:#fff;cursor:pointer;transition:.25s;}
 .model-btn:hover{background:#444;transform:scale(1.05);}
 
+
+    /* Action overlay buttons */
+    .action-overlay{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:8px;z-index:20;}
+    .action-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+                border-radius:50%;font-size:22px;padding:0;line-height:1;background:#007bff}
+    .action-btn.gray{background:#6c757d;}
+    .action-btn:hover{filter:brightness(1.15);}
+
 </style>
 </head>
 <body>
@@ -119,6 +127,15 @@
     <!-- LEWA KOLUMNA -------------------------------------------------->
     <div class="gun-wrap">
       <div id="gun-view" class="gun-view" aria-live="polite">
+
+      <!-- Action icons overlay -->
+      
+      <div class="action-overlay">
+        <button id="bg-icon" class="btn gray action-btn" title="Zmień tło">🖼️</button>
+        <button id="save-icon" class="btn blue action-btn" title="Zapisz obraz">💾</button>
+      </div>
+
+
 <!-- overlay producentów -->
 <div id="model-select" class="model-select">
   <button class="model-btn" data-model="glock">Glock</button>
@@ -127,10 +144,14 @@
 </div>
 
         <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      </div>
+        <div id="action-overlay" class="action-overlay hidden">
+          <button id="bg-overlay" class="overlay-btn">Zmień&nbsp;Tło</button>
+          <button id="save-overlay" class="overlay-btn">Zapisz&nbsp;Obraz</button>
+        </div>
 
-      <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
-      <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
+      </div>
+      <button id="bg-btn" class="btn gray" type="button" style="display:none">Zmień Tło</button>
+      <button id="save-btn" class="btn blue" type="button" style="display:none">Zapisz Obraz</button>
 
       <!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
       <div class="summary"><div id="summary-list"></div></div>
@@ -203,5 +224,17 @@
       reorder();
     })();
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const bgIcon=document.getElementById("bg-icon");
+  const saveIcon=document.getElementById("save-icon");
+  const hiddenBg=document.getElementById("bg-btn");
+  const hiddenSave=document.getElementById("save-btn");
+  if(bgIcon && hiddenBg) bgIcon.addEventListener("click", ()=>hiddenBg.click());
+  if(saveIcon && hiddenSave) saveIcon.addEventListener("click", ()=>hiddenSave.click());
+});
+</script>
 </body>
+
 </html>

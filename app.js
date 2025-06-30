@@ -164,7 +164,9 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
-      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
+      const overlayEl=document.getElementById("action-overlay");
+      gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
+      if(overlayEl) gunBox.appendChild(overlayEl);
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
