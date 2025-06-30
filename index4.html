@@ -7,18 +7,23 @@
 <style>
 :root{--bg:#000;--txt:#fff;--pri:#007bff;}
 *{box-sizing:border-box;margin:0;padding:0}
-body{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
+body{display:flex;flex-direction:column;justify-content:center;align-items:center;
+     min-height:100vh;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,
+     "Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
+
 .logo{width:800px;height:auto;max-width:none;margin-bottom:60px;}
 h1{font-size:clamp(24px,5vw,36px);margin-bottom:32px;letter-spacing:1px}
 .icon-row{display:flex;gap:32px;flex-wrap:wrap;justify-content:center}
 .icon-row a{display:block;border-radius:24px;background:#111;padding:32px;transition:.25s}
 .icon-row img{width:160px;height:160px;object-fit:contain;}
 .icon-row a:hover{transform:scale(1.05);box-shadow:0 0 12px #0af;}
+
 #preload-overlay{position:fixed;inset:0;background:#000e;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;}
 #preload-bar{width:0;height:8px;background:var(--pri);transition:width .25s;}
 #preload-box{width:60%;max-width:400px;border:1px solid #444}
 #preload-text{margin-top:12px;font-size:14px;color:var(--txt);}
 .hidden{display:none;}
+
 @media(max-width:600px){
   .logo{width:90vw;}
   .icon-row img{width:120px;height:120px;}
@@ -41,6 +46,7 @@ h1{font-size:clamp(24px,5vw,36px);margin-bottom:32px;letter-spacing:1px}
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
+
   const assets=[
     "img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png",
     "img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png",
@@ -56,10 +62,10 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   function update(){
     loaded++;
-    const pct=Math.round((loaded/total)*100);
+    const pct=Math.round(loaded/total*100);
     bar.style.width=pct+"%";
     text.textContent="Ładowanie "+pct+"%";
-    if(loaded>=total){
+    if(loaded===total){
       overlay.classList.add("hidden");
     }
   }
@@ -68,8 +74,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(src.endsWith(".svg")){
       fetch(src).then(update).catch(update);
     }else{
-      const i=new Image();
-      i.onload=update;i.onerror=update;i.src=src;
+      const img=new Image();
+      img.onload=update;
+      img.onerror=update;
+      img.src=src;
     }
   });
 });
