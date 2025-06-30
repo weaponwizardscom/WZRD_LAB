@@ -112,14 +112,6 @@
 .model-btn{padding:14px 24px;font-size:18px;font-weight:700;border:none;border-radius:8px;background:#222;color:#fff;cursor:pointer;transition:.25s;}
 .model-btn:hover{background:#444;transform:scale(1.05);}
 
-
-    /* === Overlay action buttons === */
-    .action-overlay{position:absolute;bottom:8px;right:8px;display:flex;flex-direction:column;gap:6px;z-index:30;pointer-events:none;}
-    .small-btn{pointer-events:auto;padding:6px 8px;font-size:11px;line-height:1.1;border:none;border-radius:4px;color:#fff;cursor:pointer;}
-    .small-btn.gray{background:#6c757d;}
-    .small-btn.blue{background:#007bff;}
-    .hidden{display:none;}
-
 </style>
 </head>
 <body>
@@ -135,12 +127,7 @@
 </div>
 
         <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      
-      <div id="action-overlay" class="action-overlay hidden">
-        <button id="bg-icon" class="small-btn gray">Zmień<br>Tło</button>
-        <button id="save-icon" class="small-btn blue">Zapisz<br>Obraz</button>
       </div>
-
 
       <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
       <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
@@ -216,17 +203,5 @@
       reorder();
     })();
   </script>
-
-<script id="icon-map">
-document.addEventListener("DOMContentLoaded",()=>{
-  const bgI=document.getElementById("bg-icon");
-  const svI=document.getElementById("save-icon");
-  const bgBtn=document.getElementById("bg-btn");
-  const svBtn=document.getElementById("save-btn");
-  if(bgI&&bgBtn) bgI.onclick=()=>bgBtn.click();
-  if(svI&&svBtn) svI.onclick=()=>svBtn.click();
-});
-</script>
-
 </body>
 </html>
