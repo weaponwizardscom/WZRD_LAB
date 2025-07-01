@@ -163,12 +163,11 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    let lang = localStorage.getItem("lang") || "pl", selections={},activePart=null,bgIdx=0;
+    let lang="pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
-        setLang(lang);
-        // overlay mapping
+// overlay mapping
 overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
 overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
 addModelListeners();// defaultBlack() disabled as per user request
@@ -242,7 +241,6 @@ addModelListeners();// defaultBlack() disabled as per user request
                                      :"After sending, attach the downloaded PNG.";
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       updateSummary();
-      updatePrice();
     }
     
     /* wybór części */
