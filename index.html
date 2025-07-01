@@ -76,39 +76,35 @@ document.addEventListener("DOMContentLoaded",()=>{
     const btnPl=document.getElementById('lang-pl');
     const btnEn=document.getElementById('lang-en');
 
-    // ZMIANA: Skrypt tłumaczy teraz więcej elementów
+    // Funkcja do dynamicznej zmiany języka
+    function setLanguage(lang){
+        // Tytuł strony
+        document.title = lang === 'pl' ? 'Weapon Wizards – Wybór broni' : 'Weapon Wizards – Choose weapon';
+        // Nagłówek
+        document.getElementById('choose-heading').textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE WEAPON TYPE';
+        // Teksty alternatywne dla obrazków
+        document.querySelector('#btn-pistol img').alt = lang === 'pl' ? 'Pistolet' : 'Pistol';
+        document.querySelector('#btn-rifle img').alt = lang === 'pl' ? 'Karabin' : 'Rifle';
+        document.querySelector('#btn-shotgun img').alt = lang === 'pl' ? 'Strzelba' : 'Shotgun';
+    }
+
+    // Funkcja wywoływana po kliknięciu flagi
     function choose(lang){
       localStorage.setItem('lang',lang);
       ov.style.display='none';
-      
-      // Tytuł strony
-      document.title = lang === 'pl' ? 'Weapon Wizards – Wybór broni' : 'Weapon Wizards – Choose weapon';
-      
-      // Nagłówek
-      document.getElementById('choose-heading').textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE WEAPON TYPE';
-      
-      // Teksty alternatywne dla obrazków
-      document.querySelector('#btn-pistol img').alt = lang === 'pl' ? 'Pistolet' : 'Pistol';
-      document.querySelector('#btn-rifle img').alt = lang === 'pl' ? 'Karabin' : 'Rifle';
-      document.querySelector('#btn-shotgun img').alt = lang === 'pl' ? 'Strzelba' : 'Shotgun';
-
-      // Odśwież stronę, aby preloader pokazał się w nowym języku
-      location.reload();
+      setLanguage(lang); // Użyj funkcji do zmiany tekstów
+      // LINIĘ location.reload(); USUNIĘTO - TO ROZWIĄZUJE PROBLEM
     }
 
     btnPl.addEventListener('click',()=>choose('pl'));
     btnEn.addEventListener('click',()=>choose('en'));
     
-    // ZMIANA: Funkcja, która od razu ustawia język, jeśli jest zapisany
+    // Funkcja, która od razu ustawia język, jeśli jest zapisany w pamięci
     function applyStoredLanguage(){
       const stored=localStorage.getItem('lang');
       if(stored){
         ov.style.display='none'; // Ukryj wybór języka
-        document.title = stored === 'pl' ? 'Weapon Wizards – Wybór broni' : 'Weapon Wizards – Choose weapon';
-        document.getElementById('choose-heading').textContent = stored ==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE WEAPON TYPE';
-        document.querySelector('#btn-pistol img').alt = stored === 'pl' ? 'Pistolet' : 'Pistol';
-        document.querySelector('#btn-rifle img').alt = stored === 'pl' ? 'Karabin' : 'Rifle';
-        document.querySelector('#btn-shotgun img').alt = stored === 'pl' ? 'Strzelba' : 'Shotgun';
+        setLanguage(stored); // Zastosuj zapisany język
       }
     }
     applyStoredLanguage();
