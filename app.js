@@ -12,8 +12,17 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
     let currentSvg=null;
-    const TEXTURE ="img/glock17.png";
+    let currentTexture=null; // *** ZMIANA: Zmienna na aktualną teksturę ***
+    
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
+    
+    // *** NOWOŚĆ: Obiekt mapujący modele na tekstury ***
+    const TEXTURES = {
+        glock: "img/glock17.png",
+        cz: "img/cz_texture.png", // Założenie, że tak nazywa się plik - zmień w razie potrzeby
+        sig: "img/sig_texture.png"  // Założenie, że tak nazywa się plik - zmień w razie potrzeby
+    };
+
     let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
@@ -62,8 +71,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       addModelListeners(); changeBg(); setLang(lang);
     })();
     
+    // *** Reszta funkcji (z poprzednich zmian) pozostaje bez zmian ***
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
-    
     async function loadSvg(){
       if(!currentSvg)return;
       gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
@@ -79,7 +88,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       setLang(lang);
     }
-    
     function buildUI(){
       PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
@@ -87,28 +95,22 @@ document.addEventListener("DOMContentLoaded",()=>{
         else { b.onclick=()=>selectPart(b,p.id); }
         partsBox.appendChild(b);
       });
-      
       ['MIX (≤2)','MIX (3+)'].forEach((txt,i)=>{
         const m=document.createElement("button"); m.className="mix"; m.textContent=txt;
         m.onclick=()=>mix(i?undefined:2); partsBox.appendChild(m);
       });
-
       const camoAlphaBtn=document.createElement("button");
       camoAlphaBtn.textContent="CAMO ALPHA"; camoAlphaBtn.className="camo-alpha";
       camoAlphaBtn.onclick = openCamoModal; partsBox.appendChild(camoAlphaBtn);
-
       const camoCharlieBtn = document.createElement("button");
       camoCharlieBtn.textContent = "CAMO CHARLIE"; camoCharlieBtn.className = "camo-charlie";
       camoCharlieBtn.disabled = true; partsBox.appendChild(camoCharlieBtn);
-
       const mixCamoAlphaBtn = document.createElement("button");
       mixCamoAlphaBtn.textContent = "MIX CAMO ALPHA"; mixCamoAlphaBtn.className = "mix-camo";
       mixCamoAlphaBtn.onclick = mixCamo; partsBox.appendChild(mixCamoAlphaBtn);
-
       const mixCamoCharlieBtn = document.createElement("button");
       mixCamoCharlieBtn.textContent = "MIX CAMO CHARLIE"; mixCamoCharlieBtn.className = "mix-camo";
       mixCamoCharlieBtn.disabled = true; partsBox.appendChild(mixCamoCharlieBtn);
-      
       Object.entries(COLORS).forEach(([full,hex])=>{
         const [code,...rest]=full.split(" "); const name=rest.join(" ");
         const sw=document.createElement("div"); sw.className="sw"; sw.title=full;
@@ -116,12 +118,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         sw.innerHTML=`<div class="dot" style="background:${hex}"></div><div class="lbl">${code}<br>${name}</div>`;
         palette.appendChild(sw);
       });
-    
       resetBtn.onclick=resetAll; sendBtn.onclick=()=>sendModal.classList.remove("hidden");
       mCancel.onclick=()=>sendModal.classList.add("hidden"); mSend.onclick=sendMail;
       langPl.onclick=()=>setLang("pl"); langEn.onclick=()=>setLang("en");
     }
-    
     function buildCamoPalette() {
         camoPalette.innerHTML = '';
         Object.entries(COLORS).forEach(([full, hex]) => {
@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             camoPalette.appendChild(sw);
         });
     }
-
     function openCamoModal() {
         camoTempSelections[0] = camoSelections.c1; camoTempSelections[1] = camoSelections.c2;
         camoSwatch1.style.backgroundColor = camoTempSelections[0] || '#333';
@@ -142,18 +141,15 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoConfirmBtn.onclick = confirmCamoSelection;
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
-
     function selectCamoColor(hex) {
         camoTempSelections[camoSelectionIndex] = hex;
         (camoSelectionIndex === 0 ? camoSwatch1 : camoSwatch2).style.backgroundColor = hex;
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
-    
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
       const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
-      
       partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo):not(.camo-charlie)").forEach(b=>{
         const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
       });
@@ -169,16 +165,14 @@ document.addEventListener("DOMContentLoaded",()=>{
       modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
       camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
       camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
-      
-      updateSummaryAndPrice();
+      if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
+      updateSummaryAndPrice();
     }
-    
     function selectPart(btn,id){
       partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
       btn.classList.add("selected"); activePart=id;
     }
-    
     function applyColorToSVG(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
@@ -188,14 +182,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         if (code) { selections[id] = code; } 
         else { delete selections[id]; }
     }
-    
     function clearCamo() {
         if (!camoSelections.c1 && !camoSelections.c2) return;
         applyColorToSVG('c1', 'transparent', null);
         applyColorToSVG('c2', 'transparent', null);
         camoSelections = { c1: null, c2: null };
     }
-
     function clearSolidColors() {
         PARTS.forEach(p => {
             if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
@@ -203,14 +195,12 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
-
     function applyColor(id, hex, code){
       if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
       clearCamo();
       applyColorToSVG(id, hex, code);
       updateSummaryAndPrice();
     }
-    
     function mix(maxCols){
       clearCamo();
       clearSolidColors();
@@ -225,7 +215,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       updateSummaryAndPrice();
     }
-    
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
         if (color1 && color2) {
@@ -241,7 +230,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
         }
     }
-
     function mixCamo() {
         clearSolidColors();
         const keys = Object.keys(COLORS);
@@ -250,21 +238,17 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
-    
     function resetAll(){
       clearCamo();
       clearSolidColors();
       activePart=null;
       updateSummaryAndPrice();
     }
-    
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
-    
     function updateSummaryAndPrice(){
       summaryList.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
       let hasSelections = false;
-
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
           const isCamoPart = ['c1', 'c2'].includes(partId);
@@ -275,12 +259,10 @@ document.addEventListener("DOMContentLoaded",()=>{
               summaryList.appendChild(d);
           }
       });
-      
       summaryPlaceholder.style.display = hasSelections ? 'none' : 'flex';
       if (!hasSelections) {
           summaryPlaceholder.textContent = lang === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       }
-
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
@@ -295,18 +277,24 @@ document.addEventListener("DOMContentLoaded",()=>{
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
     }
     
-    function addModelListeners(){ document.querySelectorAll(".model-btn").forEach(btn=>{ btn.addEventListener("click",()=>chooseModel(btn.dataset.model)); });}
+    // *** ZMIANA: Zaktualizowana funkcja wyboru modelu ***
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
+      currentTexture = TEXTURES[model] || TEXTURES.glock; // Wybierz teksturę dla modelu lub domyślną
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
       bgIdx=0; changeBg(); loadSvg();
     }
+    
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
+    // *** ZMIANA: Zaktualizowana funkcja zapisu obrazu ***
     async function savePng(download=false){
       const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
       const ctx=cvs.getContext("2d");
-      ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200); ctx.drawImage(await loadImg(TEXTURE),0,0,1600,1200);
+      ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200);
+      if(currentTexture) { // Rysuj teksturę tylko jeśli jest zdefiniowana
+        ctx.drawImage(await loadImg(currentTexture),0,0,1600,1200);
+      }
       const svg=gunBox.querySelector("svg");
       await Promise.all([...svg.querySelectorAll(".color-overlay")].filter(o=>o.style.fill!=="transparent").map(async ov=>{
         const xml=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg.getAttribute("viewBox")}"><g style="mix-blend-mode:hard-light;opacity:.45">${ov.outerHTML}</g></svg>`;
