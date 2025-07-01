@@ -150,12 +150,13 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
     
+    // ZMIANA: Uzupełnienie tłumaczenia dla placeholdera
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
       const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
       
-      partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo)").forEach(b=>{
+      partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo):not(.camo-charlie)").forEach(b=>{
         const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
       });
       hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
@@ -171,8 +172,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
       camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
       
-      // ZMIANA: Tłumaczenie dla placeholdera
-      if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear in this area.';
+      if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
       updateSummaryAndPrice();
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
-    // ZMIANA: Logika dla placeholdera w podsumowaniu
+    // ZMIANA: Logika dla placeholdera
     function updateSummaryAndPrice(){
       const list=$("summary-list"); list.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded",()=>{
               list.appendChild(d);
           }
       });
-
+      
       summaryPlaceholder.style.display = hasSelections ? 'none' : 'flex';
 
       let total = 0;
