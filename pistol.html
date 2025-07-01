@@ -113,33 +113,30 @@
 
 
     /* --- Overlay action buttons --- */
+    /* *** ZMIANA: Zaktualizowane style dla przycisków na nakładce *** */
     .action-overlay{
       position:absolute;
       right:10px;
       bottom:10px;
       display:flex;
       flex-direction:column;
-      gap:8px; /* Zwiększony odstęp */
+      gap:8px; /* Lekko zwiększony odstęp */
       z-index:30;
     }
-    /* *** ZMIANA: Nowe, większe i kolorowe przyciski na nakładce *** */
     .overlay-btn{
-      padding:6px 10px;
-      font-size:14px; /* Większa czcionka */
-      font-weight: 600;
-      line-height:1.2;
+      padding:4px 8px;
+      font-size:12px; /* Powrót do mniejszej czcionki */
+      line-height:1.1;
       color:#fff;
-      background:rgba(0, 123, 255, 0.6); /* Półprzezroczysty niebieski (var(--pri)) */
-      border:1px solid rgba(255, 255, 255, 0.4);
-      border-radius:5px;
+      background:rgba(80, 80, 80, 0.35); /* Bardziej przezroczyste, szare tło */
+      border:1px solid rgba(255, 255, 255, 0.2); /* Subtelna ramka */
+      border-radius:4px;
       cursor:pointer;
-      backdrop-filter:blur(5px);
-      transform: scale(1.2); /* Powiększenie o 20% */
-      transform-origin: bottom right; /* Ustawienie punktu transformacji */
+      backdrop-filter:blur(6px); /* Zwiększone rozmycie dla lepszego efektu "szkła" */
       transition: background-color 0.2s ease;
     }
     .overlay-btn:hover{
-      background:rgba(0, 123, 255, 0.85); /* Ciemniejszy niebieski po najechaniu */
+      background:rgba(80, 80, 80, 0.55); /* Ciemniejsze tło po najechaniu */
     }
     
 </style>
@@ -183,7 +180,7 @@
         <div class="palette-wrap"><div id="palette" class="palette"></div></div>
       </div>
 
-      <button id="reset-btn" class="btn red" type="button" style="margin-top:auto">Resetuj Kolory</button>
+      <button id="reset-btn" class="btn red" type="button" style="margin-top:auto">Resetuj kolory</button>
     </div>
   </div>
 
