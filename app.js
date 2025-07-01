@@ -163,11 +163,10 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    let lang = localStorage.getItem('lang') || 'pl', selections={},activePart=null,bgIdx=0;
+    let lang = localStorage.getItem("lang") || "pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
-  setLang(lang);
 // overlay mapping
 overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
 overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
@@ -218,7 +217,7 @@ addModelListeners();// defaultBlack() disabled as per user request
       bgBtn.onclick=changeBg;saveBtn.onclick=savePng;resetBtn.onclick=resetAll;
       sendBtn.onclick=()=>modal.classList.remove("hidden");
       mCancel.onclick=()=>modal.classList.add("hidden");mSend.onclick=sendMail;
-      langPl.onclick=()=>setLang("pl");langEn.onclick=()=>setLang("en");
+      if(langPl) langPl.onclick=()=>setLang("pl");if(langEn) langEn.onclick=()=>setLang("en");
     }
     
     /* Lang */
@@ -229,6 +228,11 @@ addModelListeners();// defaultBlack() disabled as per user request
       hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part";
       hCol.textContent  =l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
       bgBtn.textContent =l==="pl"?"Zmień Tło":"Change background";
+      const bgOverlay=document.getElementById("bg-overlay");
+      const saveOverlay=document.getElementById("save-overlay");
+      if(bgOverlay) bgOverlay.textContent = l==="pl" ? "Zmień Tło" : "Change background";
+      if(saveOverlay) saveOverlay.textContent = l==="pl" ? "Zapisz Obraz" : "Save image";
+
       saveBtn.textContent=l==="pl"?"Zapisz Obraz":"Save image";
       resetBtn.textContent=l==="pl"?"Resetuj Kolory":"Reset colours";
       sendBtn.textContent =l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
@@ -242,12 +246,6 @@ addModelListeners();// defaultBlack() disabled as per user request
                                      :"After sending, attach the downloaded PNG.";
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       updateSummary();
-
-const bgOv = document.getElementById("bg-overlay");
-const saveOv = document.getElementById("save-overlay");
-if(bgOv) bgOv.textContent = (l === "pl") ? "Zmień Tło" : "Change background";
-if(saveOv) saveOv.textContent = (l === "pl") ? "Zapisz Obraz" : "Save image";
-
     }
     
     /* wybór części */
@@ -263,13 +261,7 @@ if(saveOv) saveOv.textContent = (l === "pl") ? "Zapisz Obraz" : "Save image";
         const ov=document.getElementById(`color-overlay-${n}-${id}`);
         if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
       });
-      selections[id]=code;updateSummary();
-
-const bgOv = document.getElementById("bg-overlay");
-const saveOv = document.getElementById("save-overlay");
-if(bgOv) bgOv.textContent = (l === "pl") ? "Zmień Tło" : "Change background";
-if(saveOv) saveOv.textContent = (l === "pl") ? "Zapisz Obraz" : "Save image";
-updatePrice();
+      selections[id]=code;updateSummary();updatePrice();
     }
     
     /* MIX */
@@ -289,13 +281,7 @@ updatePrice();
       document.querySelectorAll(".color-overlay").forEach(o=>{
         (o.tagName==="g"?o.querySelectorAll("*"):[o]).forEach(s=>s.style.fill="transparent");
       });
-      selections={};activePart=null;updateSummary();
-
-const bgOv = document.getElementById("bg-overlay");
-const saveOv = document.getElementById("save-overlay");
-if(bgOv) bgOv.textContent = (l === "pl") ? "Zmień Tło" : "Change background";
-if(saveOv) saveOv.textContent = (l === "pl") ? "Zapisz Obraz" : "Save image";
-updatePrice();
+      selections={};activePart=null;updateSummary();updatePrice();
     }
     
     /* default colour */
