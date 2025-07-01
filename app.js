@@ -180,7 +180,8 @@ addModelListeners();// defaultBlack() disabled as per user request
     /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
-      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
+      gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
+      gunBox.appendChild(overlay);
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
@@ -326,7 +327,6 @@ function chooseModel(model){
   if(overlay)overlay.classList.add("hidden");
   currentSvg=MODELS[model]||"g17.svg";
   if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();loadSvg();
-  document.getElementById("action-overlay").classList.remove("hidden");
 }
 
     async function sendMail(){
