@@ -180,8 +180,7 @@ addModelListeners();// defaultBlack() disabled as per user request
     /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
-      gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
-      gunBox.appendChild(overlay);
+      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
