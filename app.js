@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded",()=>{
      {id:"zerdz", pl:"Żerdź", en:"Recoil spring"}, {id:"pazur", pl:"Pazur", en:"Extractor"},
      {id:"zrzut", pl:"Zrzut magazynka", en:"Magazine catch"}, {id:"blokadap", pl:"Blokada zamka", en:"Slide lock"},
      {id:"blokada2", pl:"Zrzut zamka", en:"Slide stop lever"}, {id:"pin", pl:"Pin", en:"Trigger pin"},
-     {id:"stopka", pl:"Stopka", en:"Floorplate"}, {id:"plytka", pl:"Płytka", en:"Back plate", disabled:true},
+     {id:"stopka", pl:"Stopka", en:"Floorplate"}, {id:"plytka", pl:"Płytka / Kurek", en:"Back plate", disabled:true},
      {id:"c1", pl:"Wzór 1", en:"Pattern 1"}, {id:"c2", pl:"Wzór 2", en:"Pattern 2"}
     ];
     
