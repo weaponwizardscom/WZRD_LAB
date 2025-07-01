@@ -163,12 +163,12 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    let lang="pl", selections={},activePart=null,bgIdx=0;
+    let lang = localStorage.getItem("lang") || "pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
-// overlay mapping
-document.getElementById("gun-view").appendChild(overlay);
+        setLang(lang);
+        // overlay mapping
 overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
 overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
 addModelListeners();// defaultBlack() disabled as per user request
@@ -180,7 +180,8 @@ addModelListeners();// defaultBlack() disabled as per user request
     /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
-      gunBox.innerHTML=await fetch(currentSvg).then(r=>r.text());
+      gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
+      gunBox.appendChild(overlay);
       const svg=gunBox.querySelector("svg");const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays";svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
@@ -241,6 +242,7 @@ addModelListeners();// defaultBlack() disabled as per user request
                                      :"After sending, attach the downloaded PNG.";
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       updateSummary();
+      updatePrice();
     }
     
     /* wybór części */
@@ -256,13 +258,7 @@ addModelListeners();// defaultBlack() disabled as per user request
         const ov=document.getElementById(`color-overlay-${n}-${id}`);
         if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
       });
-      selections[id]=code;updateSummary();
-updatePrice();
-const bgOv=document.getElementById("bg-overlay");
-const saveOv=document.getElementById("save-overlay");
-if(bgOv) bgOv.innerHTML = l==="pl"?"Zmień<br>Tło":"Change<br>BG";
-if(saveOv) saveOv.innerHTML = l==="pl"?"Zapisz<br>Obraz":"Save<br>Image";
-
+      selections[id]=code;updateSummary();updatePrice();
     }
     
     /* MIX */
@@ -282,13 +278,7 @@ if(saveOv) saveOv.innerHTML = l==="pl"?"Zapisz<br>Obraz":"Save<br>Image";
       document.querySelectorAll(".color-overlay").forEach(o=>{
         (o.tagName==="g"?o.querySelectorAll("*"):[o]).forEach(s=>s.style.fill="transparent");
       });
-      selections={};activePart=null;updateSummary();
-updatePrice();
-const bgOv=document.getElementById("bg-overlay");
-const saveOv=document.getElementById("save-overlay");
-if(bgOv) bgOv.innerHTML = l==="pl"?"Zmień<br>Tło":"Change<br>BG";
-if(saveOv) saveOv.innerHTML = l==="pl"?"Zapisz<br>Obraz":"Save<br>Image";
-
+      selections={};activePart=null;updateSummary();updatePrice();
     }
     
     /* default colour */
@@ -344,13 +334,7 @@ function chooseModel(model){
       const name=mName.value.trim(),mail=mMail.value.trim(),tel=mPhone.value.trim();
       if(!name||!mail){alert(lang==="pl"?"Podaj imię i e-mail":"Please provide name and email");return;}
       await savePng();
-      const cost=
-updatePrice();
-const bgOv=document.getElementById("bg-overlay");
-const saveOv=document.getElementById("save-overlay");
-if(bgOv) bgOv.innerHTML = l==="pl"?"Zmień<br>Tło":"Change<br>BG";
-if(saveOv) saveOv.innerHTML = l==="pl"?"Zapisz<br>Obraz":"Save<br>Image";
-
+      const cost=updatePrice();
       const body=[(lang==="pl"?"Imię":"Name")+": "+name,
                   "Telefon: "+tel,"E-mail: "+mail,
                   (lang==="pl"?"Koszt":"Cost")+": "+cost+" zł","","Kolory:",
