@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       gunBox.appendChild(overlay);
       const svg=gunBox.querySelector("svg"), layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays"; svg.appendChild(layer);
-      PARTS.filter(p=>!p.disabled).forEach(p=>{
+      PARTS.forEach(p=>{
         const base=svg.querySelector("#"+p.id); if(!base) return;
         ["1","2"].forEach(n=>{
             const ov=base.cloneNode(true); ov.id=`color-overlay-${n}-${p.id}`;
@@ -80,7 +80,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     
     function buildUI(){
-      PARTS.forEach(p=>{
+      // *** POPRAWKA: Pętla nie tworzy już przycisków dla c1 i c2 ***
+      PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
         if(p.disabled){ b.classList.add("disabled"); b.disabled=true; }
         else { b.onclick=()=>selectPart(b,p.id); }
@@ -143,7 +144,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
         if (color1 && color2) {
-            clearSolidColors();
+            clearSolidColors(); // *** NOWA LOGIKA: Czyści jednolite kolory
             camoSelections.c1 = color1; camoSelections.c2 = color2;
             const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
             const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
@@ -160,7 +161,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       lang=l; localStorage.setItem('lang', l);
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
       const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
-      partsBox.querySelectorAll("button").forEach(b=>{
+      
+      partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo)").forEach(b=>{
         const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
       });
       hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
@@ -184,56 +186,59 @@ document.addEventListener("DOMContentLoaded",()=>{
       btn.classList.add("selected"); activePart=id;
     }
     
+    // *** Funkcje pomocnicze dla nowej logiki ***
     function _applyColorToPart(id, hex, code) {
+        if (!id) return;
         ["1","2"].forEach(n=>{
             const ov=$(`color-overlay-${n}-${id}`);
             if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
         });
-        selections[id] = code;
+        if (code) { selections[id] = code; } 
+        else { delete selections[id]; }
     }
-
-    function applyColor(id, hex, code){
-      if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
-      clearCamo();
-      _applyColorToPart(id, hex, code);
-      updateSummary(); updatePrice();
-    }
-
+    
     function clearCamo() {
         _applyColorToPart('c1', 'transparent', null);
         _applyColorToPart('c2', 'transparent', null);
-        delete selections.c1;
-        delete selections.c2;
         camoSelections = { c1: null, c2: null };
     }
 
     function clearSolidColors() {
-        Object.keys(selections).forEach(partId => {
-            if (partId !== 'c1' && partId !== 'c2') {
-                _applyColorToPart(partId, 'transparent', null);
-                delete selections[partId];
+        PARTS.forEach(p => {
+            if (!['c1', 'c2'].includes(p.id)) {
+                _applyColorToPart(p.id, 'transparent', null);
             }
         });
     }
+
+    // *** Główne funkcje z zaimplementowaną nową logiką ***
+    function applyColor(id, hex, code){
+      if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
+      clearCamo(); // NAJPIERW CZYŚĆ TRYB CAMO
+      _applyColorToPart(id, hex, code);
+      updateSummary(); updatePrice();
+    }
     
     function mix(maxCols){
-      clearCamo();
+      clearCamo(); // NAJPIERW CZYŚĆ TRYB CAMO
       const keys=Object.keys(COLORS), used=new Set();
+      // Losuj kolory tylko dla standardowych części
       PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id)).forEach(p=>{
         let pick;
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
         while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
         used.add(pick.split(" ")[0]);
-        applyColor(p.id,COLORS[pick],pick.split(" ")[0]);
+        _applyColorToPart(p.id,COLORS[pick],pick.split(" ")[0]);
       });
       updateSummary(); updatePrice();
     }
-
+    
     function mixCamo() {
-        clearSolidColors();
+        clearSolidColors(); // NAJPIERW CZYŚĆ TRYB JEDNOLITY
         const keys = Object.keys(COLORS);
         const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
         const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
+        // Użyj logiki z modala do zastosowania i zapisu
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
@@ -249,28 +254,29 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     function updateSummary(){
       const list=$("summary-list"); list.innerHTML="";
-      const isCamoActive = selections.c1 && selections.c2;
+      const isCamoActive = !!camoSelections.c1;
       
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
+          const isCamoPart = ['c1', 'c2'].includes(partId);
           // Jeśli tryb camo jest aktywny, pokazuj tylko części camo. Jeśli nie, pokazuj tylko części stałe.
-          const shouldShow = (isCamoActive && ['c1', 'c2'].includes(partId)) || (!isCamoActive && !['c1', 'c2'].includes(partId));
-          if (part && colorCode && shouldShow) {
-              const d = document.createElement("div");
-              d.textContent = `${part[lang]} – ${colorCode}`;
+          if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
+              const d=document.createElement("div");
+              d.textContent=`${part[lang]} – ${colorCode}`;
               list.appendChild(d);
           }
       });
     }
 
     function updatePrice(){
-      const isCamoActive = selections.c1 && selections.c2;
+      const isCamoActive = !!camoSelections.c1;
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
       } else {
-          const cols=new Set(Object.values(selections).filter(c => c)).size;
-          total=Object.keys(selections).filter(id => !['c1', 'c2'].includes(id)).reduce((s,id)=>s+(PRICE[id]||0),0);
+          const solidSelections = Object.keys(selections).filter(id => !['c1', 'c2'].includes(id));
+          const cols=new Set(solidSelections.map(id => selections[id])).size;
+          total = solidSelections.reduce((s,id)=>s+(PRICE[id]||0),0);
           if (cols > 0) {
             total = cols<=2 ? Math.min(total,MIX2) : Math.min(total,MIXN);
           }
@@ -278,33 +284,28 @@ document.addEventListener("DOMContentLoaded",()=>{
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
     }
     
+    // Reszta funkcji pozostaje bez zmian
     function addModelListeners(){ document.querySelectorAll(".model-btn").forEach(btn=>{ btn.addEventListener("click",()=>chooseModel(btn.dataset.model)); });}
-
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
       bgIdx=0; changeBg(); loadSvg();
     }
-
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
-    async function savePng(download = false){
+    async function savePng(download=false){
       const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
       const ctx=cvs.getContext("2d");
-      ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200);
-      ctx.drawImage(await loadImg(TEXTURE),0,0,1600,1200);
+      ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200); ctx.drawImage(await loadImg(TEXTURE),0,0,1600,1200);
       const svg=gunBox.querySelector("svg");
       await Promise.all([...svg.querySelectorAll(".color-overlay")].filter(o=>o.style.fill!=="transparent").map(async ov=>{
         const xml=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg.getAttribute("viewBox")}"><g style="mix-blend-mode:hard-light;opacity:.45">${ov.outerHTML}</g></svg>`;
         const url=URL.createObjectURL(new Blob([xml],{type:"image/svg+xml"}));
         ctx.drawImage(await loadImg(url),0,0,1600,1200); URL.revokeObjectURL(url);
       }));
-      if (download) {
-        const a=document.createElement("a"); a.href=cvs.toDataURL("image/png");
-        a.download="weapon-wizards.png"; a.click();
-      } else { return cvs.toDataURL("image/png"); }
+      if (download) { const a=document.createElement("a"); a.href=cvs.toDataURL("image/png"); a.download="weapon-wizards.png"; a.click(); } 
+      else { return cvs.toDataURL("image/png"); }
     }
-    
     async function sendMail(){
       const name = mName.value.trim(), email = mMail.value.trim(), phone = mPhone.value.trim();
       if(!name || !email){ alert(lang==="pl"?"Proszę podać imię i e-mail.":"Please provide name and e-mail."); return; }
@@ -312,8 +313,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       mSend.textContent = lang==='pl'?'Wysyłanie...':'Sending...'; mSend.disabled = true;
       modalNote.textContent = lang==='pl'?'Proszę czekać...':'Please wait...';
       try {
-        const imageData = await savePng(false);
-        const formData = new FormData();
+        const imageData = await savePng(false); const formData = new FormData();
         formData.append('name', name); formData.append('email', email); formData.append('phone', phone);
         formData.append('cost', priceBox.textContent);
         let summaryText = "";
@@ -326,9 +326,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         const result = await response.json();
         if (result.status === 'success') {
             modalNote.textContent = lang==='pl'?'Projekt wysłany pomyślnie!':'Project sent successfully!';
-            setTimeout(() => {
-                sendModal.classList.add("hidden"); mSend.textContent = originalBtnText; mSend.disabled = false;
-            }, 2000);
+            setTimeout(() => { sendModal.classList.add("hidden"); mSend.textContent = originalBtnText; mSend.disabled = false; }, 2000);
         } else { throw new Error(result.message); }
       } catch (error) {
         console.error('Błąd wysyłania:', error);

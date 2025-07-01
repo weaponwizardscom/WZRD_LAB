@@ -46,15 +46,15 @@
     .lang img{width:24px; margin-left:8px; cursor:pointer; border:2px solid transparent; border-radius:3px;}
     .lang img.active{border-color:var(--pri);}
     .parts{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-    .parts button{padding:10px 6px; font-size:12px; font-weight:600; text-align:center; background:#f5f6f7; border:1px solid var(--border); border-radius:6px; cursor:pointer;}
+    .parts button{padding:10px 6px; font-size:12px; font-weight:600; text-align:center; background:#f5f6f7; border:1px solid var(--border); border-radius:6px; cursor:pointer; color: #000; }
     .parts button.selected{background:var(--pri); color:#fff;}
     .parts button.disabled{background:#444; color:#888; cursor:not-allowed;}
 
     /* *** POPRAWIONE STYLE PRZYCISKÓW SPECJALNYCH *** */
-    .parts button.mix { background: linear-gradient(45deg, #ffd700, #ff7a00, #ff007a, #00aaff, #00ff6a); color: #fff; font-weight: 700; }
-    .parts button.camo-alpha { background-image: linear-gradient(45deg, #556B2F 25%, #8B4513 25%, #8B4513 50%, #556B2F 50%, #556B2F 75%, #8B4513 75%, #8B4513 100%); background-size: 40px 40px; color: white; font-weight: 700; border: 1px solid #fff3 !important; }
-    .parts button.camo-charlie { background-image: linear-gradient(135deg, #6B8E23 25%, #C2B280 25%, #C2B280 50%, #6B8E23 50%, #6B8E23 75%, #C2B280 75%, #C2B280 100%); background-size: 40px 40px; color: white; font-weight: 700; border: 1px solid #fff3 !important; }
-    .parts button.mix-camo { background-image: radial-gradient(circle, #ddd, #aaa, #888, #666); color: #000; font-weight: 700; border: 1px solid #fff3 !important; }
+    .parts button.mix { background: linear-gradient(45deg, #ffd700, #ff7a00, #ff007a, #00aaff, #00ff6a) !important; color: #fff !important; font-weight: 700; }
+    .parts button.camo-alpha { background-image: linear-gradient(45deg, #556B2F 25%, #8B4513 25%, #8B4513 50%, #556B2F 50%, #556B2F 75%, #8B4513 75%, #8B4513 100%) !important; background-size: 40px 40px; color: white !important; font-weight: 700; border: 1px solid #fff3 !important; }
+    .parts button.camo-charlie { background-image: linear-gradient(135deg, #6B8E23 25%, #C2B280 25%, #C2B280 50%, #6B8E23 50%, #6B8E23 75%, #C2B280 75%, #C2B280 100%) !important; background-size: 40px 40px; color: white !important; font-weight: 700; border: 1px solid #fff3 !important; }
+    .parts button.mix-camo { background-image: radial-gradient(circle, #ddd, #aaa, #888, #666) !important; color: #000 !important; font-weight: 700; border: 1px solid #fff3 !important; }
     .parts button.mix:hover, .parts button.camo-alpha:hover, .parts button.camo-charlie:hover, .parts button.mix-camo:hover { filter: brightness(1.2); box-shadow: 0 0 8px var(--pri); }
 
     .palette-wrap{max-height:400px; overflow-y:auto; padding-right:8px;}
