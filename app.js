@@ -163,7 +163,9 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    let lang = localStorage.getItem("ww_lang") || "pl", selections={},activePart=null,bgIdx=0;
+    const urlLang = new URLSearchParams(location.search).get('lang');
+  let lang = urlLang || localStorage.getItem('lang') || 'pl';
+  if(urlLang) localStorage.setItem('lang', urlLang);
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
