@@ -163,9 +163,7 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    const urlLang = new URLSearchParams(location.search).get('lang');
-  let lang = urlLang || localStorage.getItem('lang') || 'pl';
-  if(urlLang) localStorage.setItem('lang', urlLang);
+    let lang = localStorage.getItem("lang") || "pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
@@ -245,10 +243,6 @@ addModelListeners();// defaultBlack() disabled as per user request
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       updateSummary();
       updatePrice();
-      const bgOv=document.getElementById("bg-overlay");
-      const saveOv=document.getElementById("save-overlay");
-      if(bgOv) bgOv.textContent = l==="pl"?"Zmień Tło":"Change BG";
-      if(saveOv) saveOv.textContent = l==="pl"?"Zapisz Obraz":"Save Image";
     }
     
     /* wybór części */
