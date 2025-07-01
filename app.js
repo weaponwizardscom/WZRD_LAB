@@ -163,7 +163,7 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     });
     
     /* === STAN === */
-    let lang="pl", selections={},activePart=null,bgIdx=0;
+    let lang=window.selectedLang||"pl", selections={},activePart=null,bgIdx=0;
     
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();

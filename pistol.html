@@ -72,7 +72,7 @@
     .sec-hdr{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px;}
     .sec-hdr h3{font-size:18px; color:var(--txt);}
     .lang img{width:24px; margin-left:8px; cursor:pointer; border:2px solid transparent; border-radius:3px;}
-    .lang img.active{border-color:var(--pri);}
+    .lang img.active{border-color:var(--pri);} .lang{display:none;}
     .parts{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
     .parts button{padding:10px 6px; font-size:12px; font-weight:600; text-align:center; background:#f5f6f7; border:1px solid var(--border); border-radius:6px; cursor:pointer;}
     .parts button.selected{background:var(--pri); color:#fff;}
@@ -136,9 +136,23 @@
     }
     .overlay-btn:hover{background:rgba(0,0,0,.75);}
     
+
+    /* --- Language selection overlay --- */
+    .lang-select{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000d;z-index:2000;gap:40px;}
+    .lang-btn{background:none;border:none;cursor:pointer;transition:.3s;}
+    .lang-btn img{width:120px;border-radius:6px;border:3px solid #fff;box-shadow:0 0 12px #0008;}
+    .lang-btn:hover{transform:scale(1.1);}
+
 </style>
 </head>
 <body>
+
+  <!-- LANGUAGE SELECT OVERLAY -->
+  <div id="lang-select" class="lang-select">
+    <button class="lang-btn" data-lang="pl"><img src="https://flagicons.lipis.dev/flags/4x3/pl.svg" alt="PL"></button>
+    <button class="lang-btn" data-lang="en"><img src="https://flagicons.lipis.dev/flags/4x3/gb.svg" alt="EN"></button>
+  </div>
+
   <div class="configurator">
     <!-- LEWA KOLUMNA -------------------------------------------------->
     <div class="gun-wrap">
@@ -227,5 +241,20 @@
       reorder();
     })();
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const overlay=document.getElementById("lang-select");
+  overlay.querySelectorAll(".lang-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const lang=btn.dataset.lang;
+      window.selectedLang=lang;
+      if(typeof setLang==='function') setLang(lang);
+      overlay.classList.add("hidden");
+    });
+  });
+});
+</script>
+
 </body>
 </html>
