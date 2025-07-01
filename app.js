@@ -168,7 +168,6 @@ const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     /* === INIT === */
     (async()=>{await preloadBGs();buildUI();
 // overlay mapping
-document.getElementById("gun-view").appendChild(overlay);
 overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
 overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
 addModelListeners();// defaultBlack() disabled as per user request
