@@ -147,8 +147,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             camoSelections.c1 = color1; camoSelections.c2 = color2;
             const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
             const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
-            _applyColorToPart('c1', color1, code1);
-            _applyColorToPart('c2', color2, code2);
+            applyColorToSVG('c1', color1, code1);
+            applyColorToSVG('c2', color2, code2);
             camoModal.classList.add("hidden");
             updateSummaryAndPrice();
         } else {
@@ -185,9 +185,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       btn.classList.add("selected"); activePart=id;
     }
     
-    // *** KLUCZOWE POPRAWKI LOGICZNE ***
-
-    function _applyColorToPart(id, hex, code) {
+    // *** KLUCZOWA POPRAWKA: Funkcja applyColorToSVG nakłada kolor i zapisuje stan ***
+    function applyColorToSVG(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
             const ov=$(`color-overlay-${n}-${id}`);
@@ -198,33 +197,31 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     
     function clearCamo() {
-        if (!camoSelections.c1 && !camoSelections.c2) return; // Już czyste, nie rób nic
-        _applyColorToPart('c1', 'transparent', null);
-        _applyColorToPart('c2', 'transparent', null);
+        if (!camoSelections.c1 && !camoSelections.c2) return;
+        applyColorToSVG('c1', 'transparent', null);
+        applyColorToSVG('c2', 'transparent', null);
         camoSelections = { c1: null, c2: null };
     }
 
     function clearSolidColors() {
-        let changed = false;
         PARTS.forEach(p => {
             if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
-                _applyColorToPart(p.id, 'transparent', null);
-                changed = true;
+                 applyColorToSVG(p.id, 'transparent', null);
             }
         });
-        return changed;
     }
 
+    // *** POPRAWIONA GŁÓWNA FUNKCJA NAKŁADANIA KOLORU ***
     function applyColor(id, hex, code){
       if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
       clearCamo();
-      _applyColorToPart(id, hex, code); // Ta funkcja już zapisuje do 'selections'
+      applyColorToSVG(id, hex, code); // Użycie nowej, poprawionej funkcji
       updateSummaryAndPrice();
     }
     
     function mix(maxCols){
       clearCamo();
-      clearSolidColors(); // Czyścimy też stare jednolite kolory
+      clearSolidColors();
       const keys=Object.keys(COLORS), used=new Set();
       const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id));
       partsToMix.forEach(p=>{
@@ -232,7 +229,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
         while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
         used.add(pick.split(" ")[0]);
-        _applyColorToPart(p.id,COLORS[pick],pick.split(" ")[0]);
+        applyColorToSVG(p.id,COLORS[pick],pick.split(" ")[0]);
       });
       updateSummaryAndPrice();
     }
