@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     /* === DOM === */
     const $=id=>document.getElementById(id);
     const gunBox=$("gun-view"), partsBox=$("parts"), palette=$("palette"), priceBox=$("price");
+    const summaryList=$("summary-list"), summaryPlaceholder=$("summary-placeholder");
     const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"), sendBtn=$("send-btn");
     const sendModal=$("send-modal"), mSend=$("m-send"), mCancel=$("m-cancel"), mName=$("m-name"), mMail=$("m-mail"), mPhone=$("m-phone"), modalTitle=$("modal-title"), modalNote=$("modal-note");
     const camoModal=$("camo-modal"), camoPalette=$("camo-palette"), camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"), camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"), camoModalTitle=$("camo-modal-title");
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       setLang(lang);
     }
     
+    // *** ZMIANA: Nowy układ przycisków ***
     function buildUI(){
       PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
@@ -96,9 +98,17 @@ document.addEventListener("DOMContentLoaded",()=>{
       camoAlphaBtn.textContent="CAMO ALPHA"; camoAlphaBtn.className="camo-alpha";
       camoAlphaBtn.onclick = openCamoModal; partsBox.appendChild(camoAlphaBtn);
 
-      const mixCamoBtn = document.createElement("button");
-      mixCamoBtn.textContent = "MIX CAMO"; mixCamoBtn.className = "mix-camo";
-      mixCamoBtn.onclick = mixCamo; partsBox.appendChild(mixCamoBtn);
+      const camoCharlieBtn = document.createElement("button");
+      camoCharlieBtn.textContent = "CAMO CHARLIE"; camoCharlieBtn.className = "camo-charlie";
+      camoCharlieBtn.disabled = true; partsBox.appendChild(camoCharlieBtn);
+
+      const mixCamoAlphaBtn = document.createElement("button");
+      mixCamoAlphaBtn.textContent = "MIX CAMO ALPHA"; mixCamoAlphaBtn.className = "mix-camo";
+      mixCamoAlphaBtn.onclick = mixCamo; partsBox.appendChild(mixCamoAlphaBtn);
+
+      const mixCamoCharlieBtn = document.createElement("button");
+      mixCamoCharlieBtn.textContent = "MIX CAMO CHARLIE"; mixCamoCharlieBtn.className = "mix-camo";
+      mixCamoCharlieBtn.disabled = true; partsBox.appendChild(mixCamoCharlieBtn);
       
       Object.entries(COLORS).forEach(([full,hex])=>{
         const [code,...rest]=full.split(" "); const name=rest.join(" ");
@@ -139,9 +149,40 @@ document.addEventListener("DOMContentLoaded",()=>{
         (camoSelectionIndex === 0 ? camoSwatch1 : camoSwatch2).style.backgroundColor = hex;
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
-
-    // *** POPRAWIONA I SFINALIZOWANA LOGIKA PRZEŁĄCZANIA TRYBÓW ***
-
+    
+    function setLang(l){
+      lang=l; localStorage.setItem('lang', l);
+      document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
+      const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
+      
+      partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo)").forEach(b=>{
+        const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
+      });
+      hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
+      if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
+      if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
+      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
+      const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
+      if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
+      if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
+      mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
+      mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
+      modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
+      camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
+      camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
+      
+      // ZMIANA: Tłumaczenie dla placeholdera
+      if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear in this area.';
+      
+      langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
+      updateSummaryAndPrice();
+    }
+    
+    function selectPart(btn,id){
+      partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected"); activePart=id;
+    }
+    
     function applyColorToSVG(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
@@ -184,7 +225,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
         while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
         used.add(pick.split(" ")[0]);
-        // *** KRYTYCZNA POPRAWKA: Użycie właściwej funkcji 'applyColorToSVG' ***
         applyColorToSVG(p.id,COLORS[pick],pick.split(" ")[0]);
       });
       updateSummaryAndPrice();
@@ -221,53 +261,27 @@ document.addEventListener("DOMContentLoaded",()=>{
       activePart=null;
       updateSummaryAndPrice();
     }
-
-    // *** POZOSTAŁE FUNKCJE (BEZ ZMIAN) ***
-    
-    function setLang(l){
-      lang=l; localStorage.setItem('lang', l);
-      document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
-      const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
-      
-      partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo)").forEach(b=>{
-        const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
-      });
-      hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
-      if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
-      if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
-      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
-      const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
-      if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
-      if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
-      mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
-      mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
-      modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
-      camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
-      camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
-      langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
-      updateSummaryAndPrice();
-    }
-    
-    function selectPart(btn,id){
-      partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
-      btn.classList.add("selected"); activePart=id;
-    }
     
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
+    // ZMIANA: Logika dla placeholdera w podsumowaniu
     function updateSummaryAndPrice(){
       const list=$("summary-list"); list.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
-      
+      let hasSelections = false;
+
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
           const isCamoPart = ['c1', 'c2'].includes(partId);
           if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
+              hasSelections = true;
               const d=document.createElement("div");
               d.textContent=`${part[lang]} – ${colorCode}`;
               list.appendChild(d);
           }
       });
+
+      summaryPlaceholder.style.display = hasSelections ? 'none' : 'flex';
 
       let total = 0;
       if (isCamoActive) {

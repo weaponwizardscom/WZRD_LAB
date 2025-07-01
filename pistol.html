@@ -36,8 +36,19 @@
     .btn.gray{background:#6c757d;} .btn.blue{background:var(--pri);} .btn.red{background:#dc3545;}
     .btn[disabled]{background:#444; color:#888; cursor:not-allowed;}
     .summary{border:1px solid var(--border); border-radius:6px; background:#111; margin-top:16px; padding:12px; color:var(--txt);}
-    #summary-list{column-count:3; column-gap:20px;}
+    
+    /* *** ZMIANA: Stała wysokość i style dla placeholdera *** */
+    #summary-list {
+      column-count:3; column-gap:20px;
+      min-height: 120px; /* Stała minimalna wysokość */
+      position: relative;
+    }
+    #summary-placeholder {
+        position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
+        color: #666; font-size: 14px; text-align: center; column-span: all;
+    }
     #summary-list div{break-inside:avoid; margin-bottom:4px; font-size:15px;}
+
     #price{font-family:"Eurostile",sans-serif; font-weight:900; font-size:22px; margin-top:12px; color:#fff; text-align:right;}
     .controls{flex:1 1 300px; min-width:300px; display:flex; flex-direction:column;}
     .section{margin-bottom:20px;}
@@ -50,11 +61,11 @@
     .parts button.selected{background:var(--pri); color:#fff;}
     .parts button.disabled{background:#444; color:#888; cursor:not-allowed;}
 
-    /* *** POPRAWIONE STYLE PRZYCISKÓW SPECJALNYCH *** */
+    /* *** NOWE STYLE PRZYCISKÓW SPECJALNYCH *** */
     .parts button.mix { background: linear-gradient(45deg, #ffd700, #ff7a00, #ff007a, #00aaff, #00ff6a) !important; color: #fff !important; font-weight: 700; }
-    .parts button.camo-alpha { background-image: linear-gradient(45deg, #556B2F 25%, #8B4513 25%, #8B4513 50%, #556B2F 50%, #556B2F 75%, #8B4513 75%, #8B4513 100%) !important; background-size: 40px 40px; color: white !important; font-weight: 700; border: 1px solid #fff3 !important; }
-    .parts button.camo-charlie { background-image: linear-gradient(135deg, #6B8E23 25%, #C2B280 25%, #C2B280 50%, #6B8E23 50%, #6B8E23 75%, #C2B280 75%, #C2B280 100%) !important; background-size: 40px 40px; color: white !important; font-weight: 700; border: 1px solid #fff3 !important; }
-    .parts button.mix-camo { background-image: radial-gradient(circle, #ddd, #aaa, #888, #666) !important; color: #000 !important; font-weight: 700; border: 1px solid #fff3 !important; }
+    .parts button.camo-alpha { background-image: url('http://googleusercontent.com/image_generation_content/62') !important; background-size: cover; color: white !important; font-weight: 700; text-shadow: 1px 1px 2px black; border: 1px solid #fff3 !important; }
+    .parts button.camo-charlie { background-image: url('http://googleusercontent.com/image_generation_content/60') !important; background-size: cover; color: white !important; font-weight: 700; text-shadow: 1px 1px 2px black; border: 1px solid #fff3 !important; }
+    .parts button.mix-camo { background: linear-gradient(45deg, #556B2F, #6B8E23, #C2B280, #8B4513, #2F4F4F) !important; color: #fff !important; font-weight: 700; }
     .parts button.mix:hover, .parts button.camo-alpha:hover, .parts button.camo-charlie:hover, .parts button.mix-camo:hover { filter: brightness(1.2); box-shadow: 0 0 8px var(--pri); }
 
     .palette-wrap{max-height:400px; overflow-y:auto; padding-right:8px;}
@@ -102,7 +113,11 @@
       </div>
       <button id="view-btn" class="btn gray" type="button" disabled>Zmień widok</button>
       <a id="weapon-btn" href="index.html" class="btn blue">Zmień broń</a>
-      <div class="summary"><div id="summary-list"></div></div>
+      <div class="summary">
+        <div id="summary-list">
+          <div id="summary-placeholder"></div>
+        </div>
+      </div>
       <div id="price">Szacowany koszt:&nbsp;&nbsp;0&nbsp;zł</div>
       <button id="send-btn" class="btn red" type="button" style="margin-top:8px">Wyślij do Wizards!</button>
     </div>
