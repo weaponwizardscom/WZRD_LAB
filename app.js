@@ -140,6 +140,56 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
 
+    // *** POPRAWIONA I SFINALIZOWANA LOGIKA PRZEŁĄCZANIA TRYBÓW ***
+
+    function applyColorToSVG(id, hex, code) {
+        if (!id) return;
+        ["1","2"].forEach(n=>{
+            const ov=$(`color-overlay-${n}-${id}`);
+            if(ov) Array.from(ov.tagName==="g"?ov.children:[ov]).forEach(s=>s.style.fill=hex);
+        });
+        if (code) { selections[id] = code; } 
+        else { delete selections[id]; }
+    }
+    
+    function clearCamo() {
+        if (!camoSelections.c1 && !camoSelections.c2) return;
+        applyColorToSVG('c1', 'transparent', null);
+        applyColorToSVG('c2', 'transparent', null);
+        camoSelections = { c1: null, c2: null };
+    }
+
+    function clearSolidColors() {
+        PARTS.forEach(p => {
+            if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
+                 applyColorToSVG(p.id, 'transparent', null);
+            }
+        });
+    }
+
+    function applyColor(id, hex, code){
+      if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
+      clearCamo();
+      applyColorToSVG(id, hex, code);
+      updateSummaryAndPrice();
+    }
+    
+    function mix(maxCols){
+      clearCamo();
+      clearSolidColors();
+      const keys=Object.keys(COLORS), used=new Set();
+      const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id));
+      partsToMix.forEach(p=>{
+        let pick;
+        do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
+        while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
+        used.add(pick.split(" ")[0]);
+        // *** KRYTYCZNA POPRAWKA: Użycie właściwej funkcji 'applyColorToSVG' ***
+        applyColorToSVG(p.id,COLORS[pick],pick.split(" ")[0]);
+      });
+      updateSummaryAndPrice();
+    }
+    
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
         if (color1 && color2) {
@@ -155,6 +205,24 @@ document.addEventListener("DOMContentLoaded",()=>{
             alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
         }
     }
+
+    function mixCamo() {
+        clearSolidColors();
+        const keys = Object.keys(COLORS);
+        const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
+        const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
+        camoTempSelections = [color1, color2];
+        confirmCamoSelection();
+    }
+    
+    function resetAll(){
+      clearCamo();
+      clearSolidColors();
+      activePart=null;
+      updateSummaryAndPrice();
+    }
+
+    // *** POZOSTAŁE FUNKCJE (BEZ ZMIAN) ***
     
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
@@ -185,75 +253,9 @@ document.addEventListener("DOMContentLoaded",()=>{
       btn.classList.add("selected"); activePart=id;
     }
     
-    // *** KLUCZOWA POPRAWKA: Funkcja applyColorToSVG nakłada kolor i zapisuje stan ***
-    function applyColorToSVG(id, hex, code) {
-        if (!id) return;
-        ["1","2"].forEach(n=>{
-            const ov=$(`color-overlay-${n}-${id}`);
-            if(ov) Array.from(ov.tagName==="g"?ov.children:[ov]).forEach(s=>s.style.fill=hex);
-        });
-        if (code) { selections[id] = code; } 
-        else { delete selections[id]; }
-    }
-    
-    function clearCamo() {
-        if (!camoSelections.c1 && !camoSelections.c2) return;
-        applyColorToSVG('c1', 'transparent', null);
-        applyColorToSVG('c2', 'transparent', null);
-        camoSelections = { c1: null, c2: null };
-    }
-
-    function clearSolidColors() {
-        PARTS.forEach(p => {
-            if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
-                 applyColorToSVG(p.id, 'transparent', null);
-            }
-        });
-    }
-
-    // *** POPRAWIONA GŁÓWNA FUNKCJA NAKŁADANIA KOLORU ***
-    function applyColor(id, hex, code){
-      if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
-      clearCamo();
-      applyColorToSVG(id, hex, code); // Użycie nowej, poprawionej funkcji
-      updateSummaryAndPrice();
-    }
-    
-    function mix(maxCols){
-      clearCamo();
-      clearSolidColors();
-      const keys=Object.keys(COLORS), used=new Set();
-      const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id));
-      partsToMix.forEach(p=>{
-        let pick;
-        do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
-        while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
-        used.add(pick.split(" ")[0]);
-        applyColorToSVG(p.id,COLORS[pick],pick.split(" ")[0]);
-      });
-      updateSummaryAndPrice();
-    }
-
-    function mixCamo() {
-        clearSolidColors();
-        const keys = Object.keys(COLORS);
-        const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
-        const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
-        camoTempSelections = [color1, color2];
-        confirmCamoSelection();
-    }
-    
-    function resetAll(){
-      clearCamo();
-      clearSolidColors();
-      activePart=null;
-      updateSummaryAndPrice();
-    }
-    
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
     function updateSummaryAndPrice(){
-      // Podsumowanie
       const list=$("summary-list"); list.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
       
@@ -267,7 +269,6 @@ document.addEventListener("DOMContentLoaded",()=>{
           }
       });
 
-      // Cena
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
