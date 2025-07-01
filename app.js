@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     
     function buildUI(){
-      // *** POPRAWKA: Pętla nie tworzy już przycisków dla c1 i c2 ***
       PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
         if(p.disabled){ b.classList.add("disabled"); b.disabled=true; }
@@ -144,14 +143,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
         if (color1 && color2) {
-            clearSolidColors(); // *** NOWA LOGIKA: Czyści jednolite kolory
+            clearSolidColors();
             camoSelections.c1 = color1; camoSelections.c2 = color2;
             const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
             const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
             _applyColorToPart('c1', color1, code1);
             _applyColorToPart('c2', color2, code2);
             camoModal.classList.add("hidden");
-            updateSummary(); updatePrice();
+            updateSummaryAndPrice();
         } else {
             alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
         }
@@ -178,7 +177,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
       camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
-      updateSummary(); updatePrice();
+      updateSummaryAndPrice();
     }
     
     function selectPart(btn,id){
@@ -186,59 +185,63 @@ document.addEventListener("DOMContentLoaded",()=>{
       btn.classList.add("selected"); activePart=id;
     }
     
-    // *** Funkcje pomocnicze dla nowej logiki ***
+    // *** KLUCZOWE POPRAWKI LOGICZNE ***
+
     function _applyColorToPart(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
             const ov=$(`color-overlay-${n}-${id}`);
-            if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
+            if(ov) Array.from(ov.tagName==="g"?ov.children:[ov]).forEach(s=>s.style.fill=hex);
         });
         if (code) { selections[id] = code; } 
         else { delete selections[id]; }
     }
     
     function clearCamo() {
+        if (!camoSelections.c1 && !camoSelections.c2) return; // Już czyste, nie rób nic
         _applyColorToPart('c1', 'transparent', null);
         _applyColorToPart('c2', 'transparent', null);
         camoSelections = { c1: null, c2: null };
     }
 
     function clearSolidColors() {
+        let changed = false;
         PARTS.forEach(p => {
-            if (!['c1', 'c2'].includes(p.id)) {
+            if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
                 _applyColorToPart(p.id, 'transparent', null);
+                changed = true;
             }
         });
+        return changed;
     }
 
-    // *** Główne funkcje z zaimplementowaną nową logiką ***
     function applyColor(id, hex, code){
       if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
-      clearCamo(); // NAJPIERW CZYŚĆ TRYB CAMO
-      _applyColorToPart(id, hex, code);
-      updateSummary(); updatePrice();
+      clearCamo();
+      _applyColorToPart(id, hex, code); // Ta funkcja już zapisuje do 'selections'
+      updateSummaryAndPrice();
     }
     
     function mix(maxCols){
-      clearCamo(); // NAJPIERW CZYŚĆ TRYB CAMO
+      clearCamo();
+      clearSolidColors(); // Czyścimy też stare jednolite kolory
       const keys=Object.keys(COLORS), used=new Set();
-      // Losuj kolory tylko dla standardowych części
-      PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id)).forEach(p=>{
+      const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id));
+      partsToMix.forEach(p=>{
         let pick;
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
         while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
         used.add(pick.split(" ")[0]);
         _applyColorToPart(p.id,COLORS[pick],pick.split(" ")[0]);
       });
-      updateSummary(); updatePrice();
+      updateSummaryAndPrice();
     }
-    
+
     function mixCamo() {
-        clearSolidColors(); // NAJPIERW CZYŚĆ TRYB JEDNOLITY
+        clearSolidColors();
         const keys = Object.keys(COLORS);
         const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
         const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
-        // Użyj logiki z modala do zastosowania i zapisu
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
@@ -247,29 +250,27 @@ document.addEventListener("DOMContentLoaded",()=>{
       clearCamo();
       clearSolidColors();
       activePart=null;
-      updateSummary(); updatePrice();
+      updateSummaryAndPrice();
     }
     
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
-    function updateSummary(){
+    function updateSummaryAndPrice(){
+      // Podsumowanie
       const list=$("summary-list"); list.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
       
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
           const isCamoPart = ['c1', 'c2'].includes(partId);
-          // Jeśli tryb camo jest aktywny, pokazuj tylko części camo. Jeśli nie, pokazuj tylko części stałe.
           if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
               const d=document.createElement("div");
               d.textContent=`${part[lang]} – ${colorCode}`;
               list.appendChild(d);
           }
       });
-    }
 
-    function updatePrice(){
-      const isCamoActive = !!camoSelections.c1;
+      // Cena
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
@@ -284,7 +285,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
     }
     
-    // Reszta funkcji pozostaje bez zmian
     function addModelListeners(){ document.querySelectorAll(".model-btn").forEach(btn=>{ btn.addEventListener("click",()=>chooseModel(btn.dataset.model)); });}
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
@@ -317,9 +317,13 @@ document.addEventListener("DOMContentLoaded",()=>{
         formData.append('name', name); formData.append('email', email); formData.append('phone', phone);
         formData.append('cost', priceBox.textContent);
         let summaryText = "";
+        const isCamoActive = !!camoSelections.c1;
         Object.entries(selections).forEach(([partId, colorCode]) => {
             const part = PARTS.find(p => p.id === partId);
-            if (part && colorCode) summaryText += `${part[lang]} – ${colorCode}\n`;
+            const isCamoPart = ['c1', 'c2'].includes(partId);
+            if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
+                summaryText += `${part[lang]} – ${colorCode}\n`;
+            }
         });
         formData.append('summary', summaryText); formData.append('image', imageData);
         const response = await fetch('wyslij-mail.php', { method: 'POST', body: formData });
