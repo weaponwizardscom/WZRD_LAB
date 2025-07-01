@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     /* === DOM === */
     const $=id=>document.getElementById(id);
     const gunBox=$("gun-view"),partsBox=$("parts"),palette=$("palette"),priceBox=$("price");
-    const bgBtn=$("bg-btn"),saveBtn=$("save-btn"),resetBtn=$("reset-btn");
+    // *** ZMIANA: Zaktualizowane ID przycisków ***
+    const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"); 
     const sendBtn=$("send-btn"),modal=$("modal"),mSend=$("m-send"),mCancel=$("m-cancel"),
           mName=$("m-name"),mMail=$("m-mail"),mPhone=$("m-phone");
     const langPl=$("pl"),langEn=$("en"),hParts=$("h-parts"),hCol=$("h-col"),
@@ -92,11 +93,10 @@ document.addEventListener("DOMContentLoaded",()=>{
       await preloadBGs();
       buildUI();
       // overlay mapping
-      overlay.querySelector("#bg-overlay").onclick = ()=> bgBtn.click();
-      overlay.querySelector("#save-overlay").onclick = ()=> saveBtn.click();
+      overlay.querySelector("#bg-overlay").onclick = changeBg; // Przycisk na nakładce zmienia tło
+      overlay.querySelector("#save-overlay").onclick = savePng; // Przycisk na nakładce zapisuje obraz
       addModelListeners();
       changeBg();
-      // *** NOWA LINIA: Aplikuje zapisany język od razu po załadowaniu strony ***
       setLang(lang);
     })();
     
@@ -114,7 +114,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         const base=svg.querySelector("#"+p.id);if(!base)return;
         ["1","2"].forEach(n=>{const ov=base.cloneNode(true);ov.id=`color-overlay-${n}-${p.id}`;ov.classList.add("color-overlay");layer.appendChild(ov);});
       });
-      // Ponownie aplikujemy tłumaczenie, aby przetłumaczyć przyciski na nakładce
       setLang(lang);
     }
     
@@ -128,11 +127,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         else b.onclick=()=>selectPart(b,p.id);
         partsBox.appendChild(b);
       });
-      /* mix - ZMIANA: Dodano ID, tekst jest teraz ustawiany w setLang */
+      /* mix */
       ['mix1', 'mix2'].forEach((id,i)=>{
         const m=document.createElement("button");
         m.className="mix";
-        m.id = id; // Dodano ID
+        m.id = id;
         m.onclick=()=>mix(i?undefined:2);partsBox.appendChild(m);
       });
       /* paleta */
@@ -145,52 +144,46 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
     
       /* events */
-      bgBtn.onclick=changeBg;saveBtn.onclick=savePng;resetBtn.onclick=resetAll;
+      // *** ZMIANA: Usunięto zdarzenia dla starych przycisków ***
+      resetBtn.onclick=resetAll;
       sendBtn.onclick=()=>modal.classList.remove("hidden");
       mCancel.onclick=()=>modal.classList.add("hidden");mSend.onclick=sendMail;
       if(langPl) langPl.onclick=()=>setLang("pl");if(langEn) langEn.onclick=()=>setLang("en");
     }
     
-    /* Lang - ZMIANA: Funkcja jest teraz bardziej kompletna */
+    /* Lang */
     function setLang(l){
       lang=l;
-      localStorage.setItem('lang', l); // Zapisujemy wybór na przyszłość
+      localStorage.setItem('lang', l);
 
-      // Tytuł strony
       document.title = l === "pl" ? "Weapon-Wizards – Pistolet" : "Weapon-Wizards – Pistol";
 
-      // Tekst ładowania (jeśli jeszcze widoczny)
       const loadingText = document.getElementById('loading-text');
       if(loadingText) loadingText.textContent = l === 'pl' ? 'Ładowanie...' : 'Loading...';
       
-      // Przyciski części
       partsBox.querySelectorAll("button").forEach(b=>{
         const p=PARTS.find(x=>x.id===b.dataset.id);if(p)b.textContent=p[lang];
       });
 
-      // Przyciski MIX
       const mix1 = document.getElementById('mix1');
       if(mix1) mix1.textContent = l === 'pl' ? 'MIX (≤2)' : 'MIX (≤2)';
       const mix2 = document.getElementById('mix2');
       if(mix2) mix2.textContent = l === 'pl' ? 'MIX (3+)' : 'MIX (3+)';
 
-      // Nagłówki
       hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part";
       hCol.textContent  =l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
       
-      // Główne przyciski
-      bgBtn.textContent =l==="pl"?"Zmień Tło":"Change background";
-      saveBtn.textContent=l==="pl"?"Zapisz Obraz":"Save image";
+      // *** ZMIANA: Tłumaczenia dla nowych przycisków ***
+      if(viewBtn) viewBtn.textContent = l === "pl" ? "ZMIEN WIDOK" : "CHANGE VIEW";
+      if(weaponBtn) weaponBtn.textContent = l === "pl" ? "ZMIEN BROŃ" : "CHANGE WEAPON";
       resetBtn.textContent=l==="pl"?"Resetuj Kolory":"Reset colours";
       sendBtn.textContent =l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
 
-      // Przyciski na nakładce obrazka
       const bgOverlay=document.getElementById("bg-overlay");
       const saveOverlay=document.getElementById("save-overlay");
       if(bgOverlay) bgOverlay.textContent = l==="pl" ? "Zmień Tło" : "Change background";
       if(saveOverlay) saveOverlay.textContent = l==="pl" ? "Zapisz Obraz" : "Save image";
 
-      // Okno modalne
       mSend.textContent   =l==="pl"?"Wyślij":"Send";
       mCancel.textContent =l==="pl"?"Anuluj":"Cancel";
       mName.placeholder   =l==="pl"?"Imię":"Name";
@@ -200,12 +193,10 @@ document.addEventListener("DOMContentLoaded",()=>{
       modalNote.textContent =l==="pl"?"Po wysłaniu dołącz pobrany plik PNG."
                                      :"After sending, attach the downloaded PNG.";
       
-      // Aktywne flagi
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       
-      // Aktualizacja podsumowania i ceny
       updateSummary();
-      updatePrice(); // Dodano wywołanie, aby odświeżyć tekst "Szacowany koszt"
+      updatePrice();
     }
     
     /* wybór części */
@@ -259,7 +250,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       const cols=new Set(Object.values(selections)).size;
       let total=Object.keys(selections).reduce((s,id)=>s+(PRICE[id]||0),0);
       total=cols<=2?Math.min(total,MIX2):Math.min(total,MIXN);
-      // ZMIANA: Tekst jest teraz pobierany dynamicznie z `lang`
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
       return total;
     }

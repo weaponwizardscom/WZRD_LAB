@@ -55,8 +55,9 @@
     .color-overlay { pointer-events:none; mix-blend-mode:hard-light; opacity:.45; }
 
     /* --------- PRZYCISKI -------------------------------------------- */
-    .btn { width:100%; padding:12px; font-size:16px; border:none; color:#fff; border-radius:6px; cursor:pointer; }
+    .btn { display:inline-block; text-align:center; text-decoration: none; width:100%; padding:12px; font-size:16px; border:none; color:#fff; border-radius:6px; cursor:pointer; }
     .btn.gray{background:#6c757d;} .btn.blue{background:var(--pri);} .btn.red{background:#dc3545;}
+    .btn[disabled]{background:#444; color:#888; cursor:not-allowed;} /* Styl dla nieaktywnego przycisku */
 
     /* --------- PODSUMOWANIE ----------------------------------------- */
     .summary{border:1px solid var(--border); border-radius:6px; background:#111; margin-top:16px; padding:12px; color:var(--txt);}
@@ -148,9 +149,10 @@
 
         <p id="loading-text" style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
       </div>
+      
+      <button id="view-btn" class="btn gray" type="button" disabled>ZMIEN WIDOK</button>
+      <a id="weapon-btn" href="index.html" class="btn blue">ZMIEN BROŃ</a>
 
-      <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
-      <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
 
       <div class="summary"><div id="summary-list"></div></div>
       <div id="price">Szacowany koszt:&nbsp;&nbsp;0&nbsp;zł</div>
