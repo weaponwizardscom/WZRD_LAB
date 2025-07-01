@@ -243,8 +243,13 @@ addModelListeners();// defaultBlack() disabled as per user request
       langPl.classList.toggle("active",l==="pl");langEn.classList.toggle("active",l==="en");
       updateSummary();
       updatePrice();
-      const bgOv=document.getElementById("bg-overlay");
-      const saveOv=document.getElementById("save-overlay");
+      
+/* update overlay button texts */
+if(overlay){
+  overlay.querySelector('#bg-overlay').textContent = l==='pl' ? 'Zmień Tło' : 'Change background';
+  overlay.querySelector('#save-overlay').textContent = l==='pl' ? 'Zapisz Obraz' : 'Save image';
+}
+
       if(bgOv) bgOv.textContent = l==="pl"?"Zmień Tło":"Change BG";
       if(saveOv) saveOv.textContent = l==="pl"?"Zapisz Obraz":"Save Image";
     }
