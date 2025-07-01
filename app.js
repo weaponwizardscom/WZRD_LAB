@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
     const TEXTURES = {
         glock: "img/glock17.png",
-        cz: "img/cz_texture.png",
+        cz: "img/cz.png",
         sig: "img/sig_texture.png"
     };
     let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
