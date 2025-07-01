@@ -12,17 +12,13 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
     let currentSvg=null;
-    let currentTexture=null; // *** ZMIANA: Zmienna na aktualną teksturę ***
-    
+    let currentTexture=null;
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
-    
-    // *** NOWOŚĆ: Obiekt mapujący modele na tekstury ***
     const TEXTURES = {
         glock: "img/glock17.png",
-        cz: "img/cz_texture.png", // Założenie, że tak nazywa się plik - zmień w razie potrzeby
-        sig: "img/sig_texture.png"  // Założenie, że tak nazywa się plik - zmień w razie potrzeby
+        cz: "img/cz_texture.png",
+        sig: "img/sig_texture.png"
     };
-
     let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
@@ -65,14 +61,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     /* === INIT === */
     (async()=>{
-      await preloadBGs(); buildUI(); buildCamoPalette();
+      await preloadBGs();
+      buildUI();
+      buildCamoPalette();
       overlay.querySelector("#bg-overlay").onclick = changeBg;
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
-      addModelListeners(); changeBg(); setLang(lang);
+      addModelListeners(); // *** POPRAWKA: Wywołanie funkcji, której definicja jest przywrócona poniżej ***
+      changeBg();
+      setLang(lang);
     })();
     
-    // *** Reszta funkcji (z poprzednich zmian) pozostaje bez zmian ***
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
+    
     async function loadSvg(){
       if(!currentSvg)return;
       gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       setLang(lang);
     }
+    
     function buildUI(){
       PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
@@ -122,6 +123,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       mCancel.onclick=()=>sendModal.classList.add("hidden"); mSend.onclick=sendMail;
       langPl.onclick=()=>setLang("pl"); langEn.onclick=()=>setLang("en");
     }
+    
     function buildCamoPalette() {
         camoPalette.innerHTML = '';
         Object.entries(COLORS).forEach(([full, hex]) => {
@@ -277,22 +279,28 @@ document.addEventListener("DOMContentLoaded",()=>{
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
     }
     
-    // *** ZMIANA: Zaktualizowana funkcja wyboru modelu ***
+    // *** POPRAWKA: Przywrócona definicja funkcji addModelListeners ***
+    function addModelListeners(){
+      document.querySelectorAll(".model-btn").forEach(btn=>{
+         btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
+      });
+    }
+
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
-      currentTexture = TEXTURES[model] || TEXTURES.glock; // Wybierz teksturę dla modelu lub domyślną
+      currentTexture = TEXTURES[model] || TEXTURES.glock;
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
-      bgIdx=0; changeBg(); loadSvg();
+      bgIdx=0; changeBg();
+      resetAll(); // Resetuj stan po zmianie modelu
+      loadSvg();
     }
-    
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
-    // *** ZMIANA: Zaktualizowana funkcja zapisu obrazu ***
     async function savePng(download=false){
       const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
       const ctx=cvs.getContext("2d");
       ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200);
-      if(currentTexture) { // Rysuj teksturę tylko jeśli jest zdefiniowana
+      if(currentTexture) {
         ctx.drawImage(await loadImg(currentTexture),0,0,1600,1200);
       }
       const svg=gunBox.querySelector("svg");
