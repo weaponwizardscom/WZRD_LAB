@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     /* === DOM === */
     const $=id=>document.getElementById(id);
     const gunBox=$("gun-view"),partsBox=$("parts"),palette=$("palette"),priceBox=$("price");
-    // *** ZMIANA: Zaktualizowane ID przycisków ***
     const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"); 
     const sendBtn=$("send-btn"),modal=$("modal"),mSend=$("m-send"),mCancel=$("m-cancel"),
           mName=$("m-name"),mMail=$("m-mail"),mPhone=$("m-phone");
@@ -93,8 +92,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       await preloadBGs();
       buildUI();
       // overlay mapping
-      overlay.querySelector("#bg-overlay").onclick = changeBg; // Przycisk na nakładce zmienia tło
-      overlay.querySelector("#save-overlay").onclick = savePng; // Przycisk na nakładce zapisuje obraz
+      overlay.querySelector("#bg-overlay").onclick = changeBg;
+      overlay.querySelector("#save-overlay").onclick = savePng;
       addModelListeners();
       changeBg();
       setLang(lang);
@@ -144,7 +143,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
     
       /* events */
-      // *** ZMIANA: Usunięto zdarzenia dla starych przycisków ***
       resetBtn.onclick=resetAll;
       sendBtn.onclick=()=>modal.classList.remove("hidden");
       mCancel.onclick=()=>modal.classList.add("hidden");mSend.onclick=sendMail;
@@ -173,16 +171,16 @@ document.addEventListener("DOMContentLoaded",()=>{
       hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part";
       hCol.textContent  =l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
       
-      // *** ZMIANA: Tłumaczenia dla nowych przycisków ***
-      if(viewBtn) viewBtn.textContent = l === "pl" ? "ZMIEN WIDOK" : "CHANGE VIEW";
-      if(weaponBtn) weaponBtn.textContent = l === "pl" ? "ZMIEN BROŃ" : "CHANGE WEAPON";
-      resetBtn.textContent=l==="pl"?"Resetuj Kolory":"Reset colours";
+      // *** ZMIANA: Tłumaczenia używają teraz standardowej wielkości liter ***
+      if(viewBtn) viewBtn.textContent = l === "pl" ? "Zmień widok" : "Change view";
+      if(weaponBtn) weaponBtn.textContent = l === "pl" ? "Zmień broń" : "Change weapon";
+      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours";
       sendBtn.textContent =l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
 
       const bgOverlay=document.getElementById("bg-overlay");
       const saveOverlay=document.getElementById("save-overlay");
-      if(bgOverlay) bgOverlay.textContent = l==="pl" ? "Zmień Tło" : "Change background";
-      if(saveOverlay) saveOverlay.textContent = l==="pl" ? "Zapisz Obraz" : "Save image";
+      if(bgOverlay) bgOverlay.textContent = l==="pl" ? "Zmień tło" : "Change background";
+      if(saveOverlay) saveOverlay.textContent = l==="pl" ? "Zapisz obraz" : "Save image";
 
       mSend.textContent   =l==="pl"?"Wyślij":"Send";
       mCancel.textContent =l==="pl"?"Anuluj":"Cancel";

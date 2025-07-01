@@ -119,21 +119,28 @@
       bottom:10px;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:8px; /* Zwiększony odstęp */
       z-index:30;
     }
+    /* *** ZMIANA: Nowe, większe i kolorowe przyciski na nakładce *** */
     .overlay-btn{
-      padding:4px 8px;
-      font-size:12px;
-      line-height:1.1;
+      padding:6px 10px;
+      font-size:14px; /* Większa czcionka */
+      font-weight: 600;
+      line-height:1.2;
       color:#fff;
-      background:rgba(0,0,0,.55);
-      border:1px solid #fff3;
-      border-radius:4px;
+      background:rgba(0, 123, 255, 0.6); /* Półprzezroczysty niebieski (var(--pri)) */
+      border:1px solid rgba(255, 255, 255, 0.4);
+      border-radius:5px;
       cursor:pointer;
-      backdrop-filter:blur(4px);
+      backdrop-filter:blur(5px);
+      transform: scale(1.2); /* Powiększenie o 20% */
+      transform-origin: bottom right; /* Ustawienie punktu transformacji */
+      transition: background-color 0.2s ease;
     }
-    .overlay-btn:hover{background:rgba(0,0,0,.75);}
+    .overlay-btn:hover{
+      background:rgba(0, 123, 255, 0.85); /* Ciemniejszy niebieski po najechaniu */
+    }
     
 </style>
 </head>
@@ -150,8 +157,8 @@
         <p id="loading-text" style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
       </div>
       
-      <button id="view-btn" class="btn gray" type="button" disabled>ZMIEN WIDOK</button>
-      <a id="weapon-btn" href="index.html" class="btn blue">ZMIEN BROŃ</a>
+      <button id="view-btn" class="btn gray" type="button" disabled>Zmień widok</button>
+      <a id="weapon-btn" href="index.html" class="btn blue">Zmień broń</a>
 
 
       <div class="summary"><div id="summary-list"></div></div>
