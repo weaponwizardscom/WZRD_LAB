@@ -323,18 +323,11 @@ function addModelListeners(){
      btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
   });
 }
-
-async function chooseModel(model){
-  const selectOverlay=document.getElementById("model-select");
-  if(selectOverlay) selectOverlay.classList.add("hidden");
-  currentSvg = MODELS[model] || "g17.svg";
-  BG = (model === "cz") ? BG_CZ : BG_DEFAULT;
-  bgIdx = 0;
-  changeBg();
-  await loadSvg();
-  setLang(lang); // ensure overlay texts translated
-}
-else{BG=BG_DEFAULT;}bgIdx=0;changeBg();loadSvg();
+function chooseModel(model){
+  const overlay=document.getElementById("model-select");
+  if(overlay)overlay.classList.add("hidden");
+  currentSvg=MODELS[model]||"g17.svg";
+  if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}bgIdx=0;changeBg();loadSvg();
 }
 
     async function sendMail(){
