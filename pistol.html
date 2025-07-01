@@ -1,231 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weapon‑Wizards – Pistolet</title>
-
-  <!-- ------------- FONT ------------------------------------------------>
-  <style>
-    @font-face {
-      font-family: "Eurostile";
-      font-weight: 900;
-      font-style: normal;
-      src: local("Eurostile Extended Black"), local("Eurostile");
-    }
-
-    /* ========== WSPÓLNE ============================================== */
-    :root {
-      --page: #000;
-      --box: #000;
-      --txt: #fff;
-      --border: #dee2e6;
-      --pri: #007bff;
-    }
-    * { box-sizing: border-box; margin:0; padding:0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--page);
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    /* --------- KONFIGURATOR (desktop: 2 kolumny) --------------------- */
-    .configurator {
-      background: var(--box);
-      border-radius: 8px;
-      box-shadow: 0 8px 24px #0008;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      max-width: 1200px;
-      width: 100%;
-      padding: 24px;
-    }
-
-    /* Reset kolejności dla desktopu (>768 px) */
-    .controls, .summary, #reset-btn, #price, #send-btn { order: 0; }
-
-    /* --------- LEWA KOLUMNA ----------------------------------------- */
-    .gun-wrap { position:relative; flex: 2 1 600px; display: flex; flex-direction: column; gap: 10px; }
-    .gun-view {
-      position: relative; aspect-ratio: 4/3; width: 100%; max-width: 800px;
-      border-radius: 6px; background: #111 center/cover no-repeat;
-    }
-    .color-overlay { pointer-events:none; mix-blend-mode:hard-light; opacity:.45; }
-
-    /* --------- PRZYCISKI -------------------------------------------- */
-    .btn { width:100%; padding:12px; font-size:16px; border:none; color:#fff; border-radius:6px; cursor:pointer; }
-    .btn.gray{background:#6c757d;} .btn.blue{background:var(--pri);} .btn.red{background:#dc3545;}
-
-    /* --------- PODSUMOWANIE ----------------------------------------- */
-    .summary{border:1px solid var(--border); border-radius:6px; background:#111; margin-top:16px; padding:12px; color:var(--txt);}
-    #summary-list{column-count:3; column-gap:20px;}
-    #summary-list div{break-inside:avoid; margin-bottom:4px; font-size:15px;}
-    #price{font-family:"Eurostile",sans-serif; font-weight:900; font-size:22px; margin-top:12px; color:#fff; text-align:right;}
-
-    /* --------- PRAWA KOLUMNA (controls) ----------------------------- */
-    .controls{flex:1 1 300px; min-width:300px; display:flex; flex-direction:column;}
-    .section{margin-bottom:20px;}
-    .sec-hdr{display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px;}
-    .sec-hdr h3{font-size:18px; color:var(--txt);}
-    .lang img{width:24px; margin-left:8px; cursor:pointer; border:2px solid transparent; border-radius:3px;}
-    .lang img.active{border-color:var(--pri);}
-    .parts{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-    .parts button{padding:10px 6px; font-size:12px; font-weight:600; text-align:center; background:#f5f6f7; border:1px solid var(--border); border-radius:6px; cursor:pointer;}
-    .parts button.selected{background:var(--pri); color:#fff;}
-    .parts button.disabled{background:#444; color:#888; cursor:not-allowed;}
-    .mix{background:linear-gradient(45deg,#ffd700,#ff7a00,#ff007a,#00aaff,#00ff6a); color:#fff; font-weight:700; transition:.2s;}
-
-    .palette-wrap{max-height:400px; overflow-y:auto; padding-right:8px;}
-    .palette{display:grid; grid-template-columns:repeat(3,1fr); gap:25px 10px;}
-    .sw{display:flex; flex-direction:column; align-items:center; cursor:pointer;}
-    .dot{width:45px; height:45px; border-radius:50%; border:2px solid var(--border); transition:.2s;}
-    .sw:hover .dot{transform:scale(1.1); box-shadow:0 0 8px var(--pri);}
-    .lbl{margin-top:6px; font-size:11px; font-weight:600; color:#fff; text-align:center; line-height:1.25;}
-
-    /* --------- MODAL ------------------------------------------------- */
-    .modal{position:fixed; inset:0; background:#000a; display:flex; align-items:center; justify-content:center; z-index:1000;}
-    .modal.hidden{display:none;}
-    .box{background:#1b1b1b; padding:24px; border-radius:8px; width:90%; max-width:420px;}
-    .box h2{color:#fff; font-size:20px; margin-bottom:16px;}
-    .box input{width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #555; background:#000; color:#fff; font-size:14px;}
-    .note{font-size:12px; color:#ff4444; margin-top:6px; text-align:center;}
-
-    /* ========== MOBILE ≤768 px ONLY ================================= */
-    @media (max-width:768px){
-      /* sticky główny obraz */ 
-      .gun-view{position:fixed; top:0; left:0; right:0; width:100vw; max-width:none; z-index:1000;}
-      body{padding-top:calc(100vw*3/4 + 20px);}
-      .configurator{gap:12px;}
-
-      #price{text-align:center;}
-      #summary-list{column-count:2;}
-    }
-    .mix:hover{filter:brightness(1.2);box-shadow:0 0 8px var(--pri);}
-      .parts button.mix{background:linear-gradient(45deg,#ffd700,#ff7a00,#ff007a,#00aaff,#00ff6a) !important;color:#fff;font-weight:700;}
-.parts button.mix:hover{filter:brightness(1.2);box-shadow:0 0 8px var(--pri);}
-    
-.model-select{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000c;z-index:10;flex-direction:column;gap:16px;}
-.model-btn{padding:14px 24px;font-size:18px;font-weight:700;border:none;border-radius:8px;background:#222;color:#fff;cursor:pointer;transition:.25s;}
-.model-btn:hover{background:#444;transform:scale(1.05);}
-
-
-    /* --- Overlay action buttons --- */
-    .action-overlay{
-      position:absolute;
-      right:10px;
-      bottom:10px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      z-index:30;
-    }
-    .overlay-btn{
-      padding:4px 8px;
-      font-size:12px;
-      line-height:1.1;
-      color:#fff;
-      background:rgba(0,0,0,.55);
-      border:1px solid #fff3;
-      border-radius:4px;
-      cursor:pointer;
-      backdrop-filter:blur(4px);
-    }
-    .overlay-btn:hover{background:rgba(0,0,0,.75);}
-    
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pistol – WZRD Lab</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="configurator">
-    <!-- LEWA KOLUMNA -------------------------------------------------->
-    <div class="gun-wrap">
-      <div id="gun-view" class="gun-view" aria-live="polite">
-<!-- overlay producentów -->
-<div id="model-select" class="model-select">
-  <button class="model-btn" data-model="glock">Glock</button>
-  <button class="model-btn" data-model="sig">SIG</button>
-  <button class="model-btn" data-model="cz">CZ</button>
+<div class="configurator">
+  <div class="gun-wrap">
+    <div id="gun-view" class="gun-view"><p style="color:#666">Ładowanie…</p></div>
+    <div id="action-overlay" class="action-overlay hidden">
+      <button id="bg-overlay" class="overlay-btn">Change BG</button>
+      <button id="save-overlay" class="overlay-btn">Save</button>
+    </div>
+    <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
+    <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
+    <div class="summary"><div id="summary-list"></div></div>
+    <div id="price"></div>
+  </div>
+  <div class="controls">
+    <h3 id="h-parts">1. Wybierz część</h3>
+    <div id="parts" class="parts"></div>
+    <h3 id="h-col">2. Wybierz kolor</h3>
+    <div id="palette" class="palette"></div>
+  </div>
 </div>
-
-        <p style="text-align:center;padding-top:20px;color:#6c757d">Ładowanie…</p>
-      </div>
-
-      <button id="bg-btn" class="btn gray" type="button">Zmień Tło</button>
-      <button id="save-btn" class="btn blue" type="button">Zapisz Obraz</button>
-
-      <!-- podsumowanie / cena / przycisk wysyłki zostaną przestawione JS -->
-      <div class="summary"><div id="summary-list"></div></div>
-      <div id="price">Szacowany koszt:&nbsp;&nbsp;0&nbsp;zł</div>
-      <button id="send-btn" class="btn red" type="button" style="margin-top:8px">Wyślij do Wizards!</button>
-    </div>
-
-    <!-- PRAWA KOLUMNA ------------------------------------------------- -->
-    <div class="controls">
-      <!-- Wybór części -->
-      <div class="section">
-        <div class="sec-hdr">
-          <h3 id="h-parts">1. Wybierz część</h3>
-          <div class="lang">
-            <img id="pl" src="https://flagicons.lipis.dev/flags/4x3/pl.svg" alt="pl">
-            <img id="en" src="https://flagicons.lipis.dev/flags/4x3/gb.svg" alt="en">
-          </div>
-        </div>
-        <div id="parts" class="parts"></div>
-      </div>
-
-      <!-- Paleta -->
-      <div class="section">
-        <div class="sec-hdr"><h3 id="h-col">2. Wybierz kolor (Cerakote)</h3></div>
-        <div class="palette-wrap"><div id="palette" class="palette"></div></div>
-      </div>
-
-      <button id="reset-btn" class="btn red" type="button" style="margin-top:auto">Resetuj Kolory</button>
-    </div>
-  </div>
-
-  <!-- MODAL ----------------------------------------------------------- -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="box">
-      <h2 id="modal-title">Wyślij projekt</h2>
-      <input id="m-name" placeholder="Imię" aria-label="Imię">
-      <input id="m-mail" placeholder="E-mail" aria-label="E-mail">
-      <input id="m-phone" placeholder="Telefon" aria-label="Telefon">
-      <button id="m-send" class="btn blue" type="button" style="margin-top:6px">Wyślij</button>
-      <button id="m-cancel" class="btn gray" type="button" style="margin-top:6px">Anuluj</button>
-      <p class="note" id="modal-note">Po wysłaniu dołącz pobrany plik PNG.</p>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-
-  <!-- SKRYPT PRZESTAWIAJĄCY KOLEJNOŚĆ W MOBILE ------------------------ -->
-  <script>
-    (function(){
-      const mq = window.matchMedia('(max-width:768px)');
-      const configurator = document.querySelector('.configurator');
-      const gunWrap = document.querySelector('.gun-wrap');
-      const controls = document.querySelector('.controls');
-      const summary = document.querySelector('.summary');
-
-      function reorder(){
-        if(mq.matches){
-          // Wstaw controls tuż przed podsumowaniem, jeśli jeszcze nie przeniesione
-          if(controls.parentNode !== gunWrap){
-            gunWrap.insertBefore(controls, summary);
-          }
-        }else{
-          // Przywróć controls jako drugi filar konfiguratora (desktop)
-          if(controls.parentNode === gunWrap){
-            configurator.appendChild(controls);
-          }
-        }
-      }
-      mq.addEventListener ? mq.addEventListener('change', reorder) : mq.addListener(reorder);
-      reorder();
-    })();
-  </script>
-</body>
-</html>
+<script src="app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const lang=new URLSearchParams(location.search).get('lang')||localStorage.getItem('ww_lang')||'pl';
+ setLang(lang);
+ // przekieruj działania nakładek
+ document.getElementById('bg-overlay').onclick=()=>document.getElementById('bg-btn').click();
+ document.getElementById('save-overlay').onclick=()=>document.getElementById('save-btn').click();
+});
+</script>
+</body></html>
