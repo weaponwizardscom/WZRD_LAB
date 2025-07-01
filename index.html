@@ -1,145 +1,42 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Weapon Wizards – Wybór broni</title>
-<style>
-:root{--bg:#000;--txt:#fff;--pri:#00aaff;}
-*{box-sizing:border-box;margin:0;padding:0}
-body{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
-.logo{width:800px;max-width:90vw;height:auto;margin-bottom:60px;}
-.icon-row{display:flex;gap:32px;flex-wrap:wrap;justify-content:center}
-.icon-row a{display:block;border-radius:24px;background:#111;padding:32px;transition:.25s}
-.icon-row img{width:160px;height:160px;object-fit:contain}
-.icon-row a:hover{transform:scale(1.05);box-shadow:0 0 12px var(--pri)}
-/* === PRELOADER === */
-#preload-overlay{position:fixed;inset:0;background:#000e;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;}
-#preload-box{width:60%;max-width:420px;border:1px solid #444}
-#preload-bar{width:0;height:8px;background:var(--pri);transition:width .25s}
-#preload-text{margin-top:12px;font-size:14px;color:var(--txt)}
-.hidden{display:none}
-@media(max-width:600px){
-  .icon-row img{width:120px;height:120px}
-  .icon-row{gap:20px}
-}
-
-    /* --- Language selection overlay --- */
-    #lang-select{
-      position:fixed;
-      inset:0;
-      background:#000e;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:24px;
-      z-index:2000;
-    }
-    .lang-btn{
-      width:120px;
-      height:80px;
-      border:3px solid #fff;
-      border-radius:8px;
-      cursor:pointer;
-      transition:.25s;
-      background-size:cover;
-      background-position:center;
-    }
-    .lang-btn:hover{
-      transform:scale(1.1);
-      box-shadow:0 0 12px #fff;
-    }
-
-</style>
+  <meta charset="utf-8">
+  <title>Weapon‑Wizards – Konfigurator</title>
+  <style>
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#000;color:#fff}
+    .loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:100}
+    .lang-chooser{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000e;backdrop-filter:blur(4px);z-index:90;flex-direction:column;gap:24px}
+    .lang-chooser img{width:96px;height:auto;cursor:pointer;border:3px solid transparent;border-radius:6px;transition:.25s}
+    .lang-chooser img:hover{transform:scale(1.1);border-color:#007bff}
+  </style>
 </head>
 <body>
 
-  <!-- Language selection overlay -->
-  <div id="lang-select">
-    <div id="lang-pl" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/pl.svg');"></div>
-    <div id="lang-en" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/gb.svg');"></div>
-  </div>
-
-<!-- PRELOADER -->
-<div id="preload-overlay">
-  <div id="preload-box"><div id="preload-bar"></div></div>
-  <div id="preload-text">Ładowanie 0%</div>
+<div class="loader" id="preloader">
+  <p>Ładowanie… / Loading…</p>
 </div>
 
-<img src="img/logo.png" alt="Weapon Wizards Customs" class="logo">
-<div class="icon-row">
-  <a href="pistol.html"><img src="img/icon_pistol.png" alt="Pistolet"></a>
-  <a href="rifle.html"><img src="img/icon_rifle.png" alt="Karabin"></a>
-  <a href="shotgun.html"><img src="img/icon_shotgun.png" alt="Strzelba"></a>
+<div class="lang-chooser" id="lang-chooser" hidden>
+  <img src="https://flagicons.lipis.dev/flags/4x3/pl.svg" alt="Polski" id="lang-pl">
+  <img src="https://flagicons.lipis.dev/flags/4x3/gb.svg" alt="English" id="lang-en">
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
-  // === LISTA ZASOBÓW DO PRELOADU ===
-  const assets=[
-    "img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png",
-    "img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png",
-    "img/glock17.png",
-    "img/icon_pistol.png","img/icon_rifle.png","img/icon_shotgun.png",
-    "g17.svg","sig.svg","cz.svg"
-  ];
+  // Simulate short fake pre‑loader
+  setTimeout(()=>{
+    document.getElementById("preloader").remove();
+    document.getElementById("lang-chooser").hidden=false;
+  },400); // 0.4 s
 
-  const total = assets.length;
-  let loaded = 0;
-
-  const bar  = document.getElementById("preload-bar");
-  const text = document.getElementById("preload-text");
-  const overlay = document.getElementById("preload-overlay");
-
-  const update = () => {
-    loaded++;
-    const pct = Math.min(100, Math.round(loaded / total * 100));
-    bar.style.width = pct + "%";
-    text.textContent = "Ładowanie " + pct + "%";
-    if (loaded >= total){ overlay.style.display="none"; }
-  };
-
-  // Preload images & SVG
-  assets.forEach(src=>{
-    if(src.endsWith(".svg")){
-      fetch(src).then(update).catch(update);
-    } else {
-      const img = new Image();
-      img.onload = update;
-      img.onerror = update;
-      img.src = src;
-    }
-  });
-
-  // Fallback: schowaj po pełnym załadowaniu strony
-  window.addEventListener("load", ()=> overlay.classList.add("hidden"));
-  // Ostateczny timeout – 20 s
-  setTimeout(()=> overlay.classList.add("hidden"), 20000);
+  function choose(lang){
+    localStorage.setItem("lang",lang);
+    location.href="pistol.html";
+  }
+  document.getElementById("lang-pl").addEventListener("click",()=>choose("pl"));
+  document.getElementById("lang-en").addEventListener("click",()=>choose("en"));
 });
 </script>
-
-  <script>
-    (function(){
-      const ov=document.getElementById('lang-select');
-      const btnPl=document.getElementById('lang-pl');
-      const btnEn=document.getElementById('lang-en');
-      function choose(lang){
-        localStorage.setItem('lang',lang);
-        ov.style.display='none';
-        // change static text on index page
-        document.getElementById('choose-heading').textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE A FIREARM';
-        document.getElementById('btn-pistol').textContent   = lang==='pl' ? 'PISTOLET' : 'PISTOL';
-        document.getElementById('btn-rifle').textContent    = lang==='pl' ? 'KARABIN' : 'RIFLE';
-        document.getElementById('btn-shotgun').textContent  = lang==='pl' ? 'STRZELBA' : 'SHOTGUN';
-      }
-      btnPl.addEventListener('click',()=>choose('pl'));
-      btnEn.addEventListener('click',()=>choose('en'));
-      // auto-select stored language
-      const stored=localStorage.getItem('lang');
-      if(stored){choose(stored);}
-    })();
-  </script>
-
 </body>
 </html>
