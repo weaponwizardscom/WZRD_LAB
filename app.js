@@ -3,8 +3,7 @@ function createOverlay(){
   const ov = document.createElement("div");
   ov.id = "action-overlay";
   ov.className = "action-overlay hidden";
-  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn"></button>' +
-                 '<button id="save-overlay" class="overlay-btn"></button>';
+  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn"></button><button id="save-overlay" class="overlay-btn"></button>';
   return ov;
 }
 const overlay = createOverlay();
@@ -19,43 +18,27 @@ document.addEventListener("DOMContentLoaded",()=>{
     const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
     const PRICE={zamek:400,szkielet:400,spust:150,lufa:200,zerdz:50,pazur:50,
-                 zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:150, c1: 100, c2: 100};
+                 zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:150};
+    const CAMO_PRICE = 1200;
     const MIX2=800, MIXN=1000;
     
     /* === DOM === */
     const $=id=>document.getElementById(id);
     const gunBox=$("gun-view"), partsBox=$("parts"), palette=$("palette"), priceBox=$("price");
-    const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"); 
-    const sendBtn=$("send-btn");
-    // Send Modal
-    const sendModal=$("send-modal"), mSend=$("m-send"), mCancel=$("m-cancel"),
-          mName=$("m-name"), mMail=$("m-mail"), mPhone=$("m-phone"),
-          modalTitle=$("modal-title"), modalNote=$("modal-note");
-    // Camo Modal
-    const camoModal=$("camo-modal"), camoPalette=$("camo-palette"),
-          camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"),
-          camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"),
-          camoModalTitle=$("camo-modal-title");
-    // Inne
+    const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"), sendBtn=$("send-btn");
+    const sendModal=$("send-modal"), mSend=$("m-send"), mCancel=$("m-cancel"), mName=$("m-name"), mMail=$("m-mail"), mPhone=$("m-phone"), modalTitle=$("modal-title"), modalNote=$("modal-note");
+    const camoModal=$("camo-modal"), camoPalette=$("camo-palette"), camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"), camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"), camoModalTitle=$("camo-modal-title");
     const langPl=$("pl"), langEn=$("en"), hParts=$("h-parts"), hCol=$("h-col");
     
     /* === DANE === */
     const PARTS=[
-     {id:"zamek",    pl:"Zamek",           en:"Slide"},
-     {id:"szkielet", pl:"Szkielet",        en:"Frame"},
-     {id:"lufa",     pl:"Lufa",            en:"Barrel"},
-     {id:"spust",    pl:"Spust",           en:"Trigger"},
-     {id:"zerdz",    pl:"Żerdź",           en:"Recoil spring"},
-     {id:"pazur",    pl:"Pazur",           en:"Extractor"},
-     {id:"zrzut",    pl:"Zrzut magazynka", en:"Magazine catch"},
-     {id:"blokadap", pl:"Blokada zamka",   en:"Slide lock"},
-     {id:"blokada2", pl:"Zrzut zamka",     en:"Slide stop lever"},
-     {id:"pin",      pl:"Pin",             en:"Trigger pin"},
-     {id:"stopka",   pl:"Stopka",          en:"Floorplate"},
-     {id:"plytka",   pl:"Płytka",          en:"Back plate", disabled:true},
-     // *** NOWE CZĘŚCI DLA KAMUFLAŻU ***
-     {id:"c1",       pl:"Wzór 1",          en:"Pattern 1"},
-     {id:"c2",       pl:"Wzór 2",          en:"Pattern 2"}
+     {id:"zamek", pl:"Zamek", en:"Slide"}, {id:"szkielet", pl:"Szkielet", en:"Frame"},
+     {id:"lufa", pl:"Lufa", en:"Barrel"}, {id:"spust", pl:"Spust", en:"Trigger"},
+     {id:"zerdz", pl:"Żerdź", en:"Recoil spring"}, {id:"pazur", pl:"Pazur", en:"Extractor"},
+     {id:"zrzut", pl:"Zrzut magazynka", en:"Magazine catch"}, {id:"blokadap", pl:"Blokada zamka", en:"Slide lock"},
+     {id:"blokada2", pl:"Zrzut zamka", en:"Slide stop lever"}, {id:"pin", pl:"Pin", en:"Trigger pin"},
+     {id:"stopka", pl:"Stopka", en:"Floorplate"}, {id:"plytka", pl:"Płytka", en:"Back plate", disabled:true},
+     {id:"c1", pl:"Wzór 1", en:"Pattern 1"}, {id:"c2", pl:"Wzór 2", en:"Pattern 2"}
     ];
     
     const COLORS={/* skrócone */};
@@ -66,267 +49,213 @@ document.addEventListener("DOMContentLoaded",()=>{
     let selections = {};
     let activePart = null;
     let bgIdx = 0;
-    // *** NOWE ZMIENNE STANU DLA KAMUFLAŻU ***
-    let camoSelections = { c1: null, c2: null }; // Ostatecznie zatwierdzone kolory
-    let camoTempSelections = [null, null]; // Tymczasowe wybory w modalu
-    let camoSelectionIndex = 0; // Wskaźnik do podmiany koloru (0 lub 1)
+    let camoSelections = { c1: null, c2: null };
+    let camoTempSelections = [null, null];
+    let camoSelectionIndex = 0;
     
     /* === INIT === */
     (async()=>{
-      await preloadBGs();
-      buildUI();
-      buildCamoPalette(); // Zbuduj paletę kamuflażu przy starcie
+      await preloadBGs(); buildUI(); buildCamoPalette();
       overlay.querySelector("#bg-overlay").onclick = changeBg;
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
-      addModelListeners();
-      changeBg();
-      setLang(lang);
+      addModelListeners(); changeBg(); setLang(lang);
     })();
     
-    /* preload BG */
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
     
-    /* SVG */
     async function loadSvg(){
       if(!currentSvg)return;
       gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
       gunBox.appendChild(overlay);
-      const svg=gunBox.querySelector("svg");
-      const layer=document.createElementNS("http://www.w3.org/2000/svg","g");
-      layer.id="color-overlays";
-      svg.appendChild(layer);
+      const svg=gunBox.querySelector("svg"), layer=document.createElementNS("http://www.w3.org/2000/svg","g");
+      layer.id="color-overlays"; svg.appendChild(layer);
       PARTS.filter(p=>!p.disabled).forEach(p=>{
-        const base=svg.querySelector("#"+p.id);
-        if(!base) return;
+        const base=svg.querySelector("#"+p.id); if(!base) return;
         ["1","2"].forEach(n=>{
-            const ov=base.cloneNode(true);
-            ov.id=`color-overlay-${n}-${p.id}`;
-            ov.classList.add("color-overlay");
-            layer.appendChild(ov);
+            const ov=base.cloneNode(true); ov.id=`color-overlay-${n}-${p.id}`;
+            ov.classList.add("color-overlay"); layer.appendChild(ov);
         });
       });
       setLang(lang);
     }
     
-    /* UI */
     function buildUI(){
-      /* części */
       PARTS.forEach(p=>{
-        const b=document.createElement("button");
-        b.textContent=p[lang];
-        b.dataset.id=p.id;
+        const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
         if(p.disabled){ b.classList.add("disabled"); b.disabled=true; }
         else { b.onclick=()=>selectPart(b,p.id); }
         partsBox.appendChild(b);
       });
       
-      /* przyciski specjalne */
       ['MIX (≤2)','MIX (3+)'].forEach((txt,i)=>{
-        const m=document.createElement("button");
-        m.className="mix";
-        m.textContent = txt;
-        m.onclick=()=>mix(i?undefined:2);
-        partsBox.appendChild(m);
+        const m=document.createElement("button"); m.className="mix"; m.textContent=txt;
+        m.onclick=()=>mix(i?undefined:2); partsBox.appendChild(m);
       });
 
-      // *** NOWE PRZYCISKI CAMO ***
-      const camoAlphaBtn = document.createElement("button");
-      camoAlphaBtn.id = "camo-alpha-btn";
-      camoAlphaBtn.textContent = "CAMO ALPHA";
-      camoAlphaBtn.className = "camo-alpha";
-      camoAlphaBtn.onclick = openCamoModal; // Nowa funkcja
-      partsBox.appendChild(camoAlphaBtn);
+      const camoAlphaBtn=document.createElement("button");
+      camoAlphaBtn.textContent="CAMO ALPHA"; camoAlphaBtn.className="camo-alpha";
+      camoAlphaBtn.onclick = openCamoModal; partsBox.appendChild(camoAlphaBtn);
 
-      const camoCharlieBtn = document.createElement("button");
-      camoCharlieBtn.id = "camo-charlie-btn";
-      camoCharlieBtn.textContent = "CAMO CHARLIE";
-      camoCharlieBtn.className = "camo-charlie";
-      camoCharlieBtn.disabled = true; // Na razie nieaktywny
-      partsBox.appendChild(camoCharlieBtn);
+      const mixCamoBtn = document.createElement("button");
+      mixCamoBtn.textContent = "MIX CAMO"; mixCamoBtn.className = "mix-camo";
+      mixCamoBtn.onclick = mixCamo; partsBox.appendChild(mixCamoBtn);
       
-      /* paleta główna */
       Object.entries(COLORS).forEach(([full,hex])=>{
-        const [code,...rest]=full.split(" ");
-        const name=rest.join(" ");
-        const sw=document.createElement("div");
-        sw.className="sw";
-        sw.title=full;
+        const [code,...rest]=full.split(" "); const name=rest.join(" ");
+        const sw=document.createElement("div"); sw.className="sw"; sw.title=full;
         sw.onclick=()=>applyColor(activePart,hex,code);
         sw.innerHTML=`<div class="dot" style="background:${hex}"></div><div class="lbl">${code}<br>${name}</div>`;
         palette.appendChild(sw);
       });
     
-      /* events */
-      resetBtn.onclick=resetAll;
-      sendBtn.onclick=()=>sendModal.classList.remove("hidden");
-      mCancel.onclick=()=>sendModal.classList.add("hidden");
-      mSend.onclick=sendMail;
-      langPl.onclick=()=>setLang("pl");
-      langEn.onclick=()=>setLang("en");
+      resetBtn.onclick=resetAll; sendBtn.onclick=()=>sendModal.classList.remove("hidden");
+      mCancel.onclick=()=>sendModal.classList.add("hidden"); mSend.onclick=sendMail;
+      langPl.onclick=()=>setLang("pl"); langEn.onclick=()=>setLang("en");
     }
     
-    // *** NOWE FUNKCJE DLA LOGIKI KAMUFLAŻU ***
-
     function buildCamoPalette() {
+        camoPalette.innerHTML = '';
         Object.entries(COLORS).forEach(([full, hex]) => {
-            const [code, ...rest] = full.split(" ");
-            const name = rest.join(" ");
-            const sw = document.createElement("div");
-            sw.className = "sw";
-            sw.title = full;
-            sw.onclick = () => selectCamoColor(hex); // Nowa funkcja obsługująca kliknięcie
+            const [code, ...rest] = full.split(" "); const name = rest.join(" ");
+            const sw = document.createElement("div"); sw.className = "sw"; sw.title = full;
+            sw.onclick = () => selectCamoColor(hex);
             sw.innerHTML = `<div class="dot" style="background:${hex}"></div><div class="lbl">${code}<br>${name}</div>`;
             camoPalette.appendChild(sw);
         });
     }
 
     function openCamoModal() {
-        // Przy otwarciu, ustaw tymczasowe kolory na te ostatnio zatwierdzone
-        camoTempSelections[0] = camoSelections.c1;
-        camoTempSelections[1] = camoSelections.c2;
-        
-        // Zaktualizuj wygląd pól podglądu
+        camoTempSelections[0] = camoSelections.c1; camoTempSelections[1] = camoSelections.c2;
         camoSwatch1.style.backgroundColor = camoTempSelections[0] || '#333';
         camoSwatch2.style.backgroundColor = camoTempSelections[1] || '#333';
-
-        // Zresetuj indeks wyboru, aby kolejne kliknięcie nadpisało pierwsze pole
         camoSelectionIndex = 0;
-        
         camoModal.classList.remove("hidden");
-        // Przypisz eventy do przycisków w modalu
         camoConfirmBtn.onclick = confirmCamoSelection;
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
 
     function selectCamoColor(hex) {
-        // Wstaw wybrany kolor w odpowiednie miejsce w tymczasowej tablicy
         camoTempSelections[camoSelectionIndex] = hex;
-        
-        // Zaktualizuj odpowiednie pole podglądu
-        if (camoSelectionIndex === 0) {
-            camoSwatch1.style.backgroundColor = hex;
-        } else {
-            camoSwatch2.style.backgroundColor = hex;
-        }
-        
-        // Przesuń indeks na następne miejsce (cyklicznie 0 -> 1 -> 0 -> 1 ...)
+        (camoSelectionIndex === 0 ? camoSwatch1 : camoSwatch2).style.backgroundColor = hex;
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
 
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
-
         if (color1 && color2) {
-            // Zapisz ostateczny wybór
-            camoSelections.c1 = color1;
-            camoSelections.c2 = color2;
-            
-            // Zastosuj kolory do odpowiednich części
-            applyColor('c1', color1, 'Camo1');
-            applyColor('c2', color2, 'Camo2');
-            
+            clearSolidColors();
+            camoSelections.c1 = color1; camoSelections.c2 = color2;
+            const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
+            const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
+            _applyColorToPart('c1', color1, code1);
+            _applyColorToPart('c2', color2, code2);
             camoModal.classList.add("hidden");
+            updateSummary(); updatePrice();
         } else {
             alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
         }
     }
-
-    /* Lang */
+    
     function setLang(l){
-      lang=l;
-      localStorage.setItem('lang', l);
-      document.title = l === "pl" ? "Weapon-Wizards – Pistolet" : "Weapon-Wizards – Pistol";
-      const loadingText = document.getElementById('loading-text');
-      if(loadingText) loadingText.textContent = l === 'pl' ? 'Ładowanie...' : 'Loading...';
-      
+      lang=l; localStorage.setItem('lang', l);
+      document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
+      const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
       partsBox.querySelectorAll("button").forEach(b=>{
-        const p=PARTS.find(x=>x.id===b.dataset.id);
-        if(p) b.textContent=p[lang];
+        const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
       });
-
-      hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part";
-      hCol.textContent  =l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
-      if(viewBtn) viewBtn.textContent = l === "pl" ? "Zmień widok" : "Change view";
-      if(weaponBtn) weaponBtn.textContent = l === "pl" ? "Zmień broń" : "Change weapon";
-      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours";
-      sendBtn.textContent =l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
-
-      const bgOverlay=document.getElementById("bg-overlay");
-      const saveOverlay=document.getElementById("save-overlay");
-      if(bgOverlay) bgOverlay.textContent = l==="pl" ? "Zmień tło" : "Change background";
-      if(saveOverlay) saveOverlay.textContent = l==="pl" ? "Zapisz obraz" : "Save image";
-
-      // Tłumaczenia dla modali
-      mSend.textContent   =l==="pl"?"Wyślij":"Send";
-      mCancel.textContent =l==="pl"?"Anuluj":"Cancel";
-      mName.placeholder   =l==="pl"?"Imię":"Name";
-      mMail.placeholder   =l==="pl"?"E-mail":"E-mail";
-      mPhone.placeholder  =l==="pl"?"Telefon":"Phone";
-      modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project";
-      modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
-      
-      // *** TŁUMACZENIA DLA NOWEGO MODALA ***
-      camoModalTitle.textContent = l === 'pl' ? 'Wybierz 2 kolory kamuflażu' : 'Select 2 camo colors';
-      camoConfirmBtn.textContent = l === 'pl' ? 'Zatwierdź' : 'Confirm';
-      camoCancelBtn.textContent = l === 'pl' ? 'Anuluj' : 'Cancel';
-      
-      langPl.classList.toggle("active",l==="pl");
-      langEn.classList.toggle("active",l==="en");
-      updateSummary();
-      updatePrice();
+      hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
+      if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
+      if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
+      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
+      const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
+      if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
+      if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
+      mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
+      mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
+      modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
+      camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
+      camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
+      langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
+      updateSummary(); updatePrice();
     }
     
-    /* Główne funkcje */
     function selectPart(btn,id){
       partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
-      btn.classList.add("selected");
-      activePart=id;
+      btn.classList.add("selected"); activePart=id;
     }
     
-    function applyColor(id,hex,code){
+    function _applyColorToPart(id, hex, code) {
+        ["1","2"].forEach(n=>{
+            const ov=$(`color-overlay-${n}-${id}`);
+            if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
+        });
+        selections[id] = code;
+    }
+
+    function applyColor(id, hex, code){
       if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
-      ["1","2"].forEach(n=>{
-        const ov=document.getElementById(`color-overlay-${n}-${id}`);
-        if(ov)(ov.tagName==="g"?ov.querySelectorAll("*"):[ov]).forEach(s=>s.style.fill=hex);
-      });
-      selections[id]=code;
-      updateSummary();
-      updatePrice();
+      clearCamo();
+      _applyColorToPart(id, hex, code);
+      updateSummary(); updatePrice();
+    }
+
+    function clearCamo() {
+        _applyColorToPart('c1', 'transparent', null);
+        _applyColorToPart('c2', 'transparent', null);
+        delete selections.c1;
+        delete selections.c2;
+        camoSelections = { c1: null, c2: null };
+    }
+
+    function clearSolidColors() {
+        Object.keys(selections).forEach(partId => {
+            if (partId !== 'c1' && partId !== 'c2') {
+                _applyColorToPart(partId, 'transparent', null);
+                delete selections[partId];
+            }
+        });
     }
     
     function mix(maxCols){
+      clearCamo();
       const keys=Object.keys(COLORS), used=new Set();
-      PARTS.filter(p=>!p.disabled).forEach(p=>{
+      PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id)).forEach(p=>{
         let pick;
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
         while(maxCols && used.size>=maxCols && !used.has(pick.split(" ")[0]));
         used.add(pick.split(" ")[0]);
         applyColor(p.id,COLORS[pick],pick.split(" ")[0]);
       });
+      updateSummary(); updatePrice();
+    }
+
+    function mixCamo() {
+        clearSolidColors();
+        const keys = Object.keys(COLORS);
+        const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
+        const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
+        camoTempSelections = [color1, color2];
+        confirmCamoSelection();
     }
     
     function resetAll(){
-      document.querySelectorAll(".color-overlay").forEach(o=>{
-        (o.tagName==="g"?o.querySelectorAll("*"):[o]).forEach(s=>s.style.fill="transparent");
-      });
-      selections={};
-      camoSelections = { c1: null, c2: null }; // Resetuj też kolory camo
+      clearCamo();
+      clearSolidColors();
       activePart=null;
-      updateSummary();
-      updatePrice();
+      updateSummary(); updatePrice();
     }
     
-    function changeBg(){
-      bgIdx=(bgIdx+1)%BG.length;
-      gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`;
-    }
+    function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
     function updateSummary(){
-      const list=$("summary-list");
-      list.innerHTML="";
+      const list=$("summary-list"); list.innerHTML="";
+      const isCamoActive = selections.c1 && selections.c2;
+      
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
-          if (part) {
+          // Jeśli tryb camo jest aktywny, pokazuj tylko części camo. Jeśli nie, pokazuj tylko części stałe.
+          const shouldShow = (isCamoActive && ['c1', 'c2'].includes(partId)) || (!isCamoActive && !['c1', 'c2'].includes(partId));
+          if (part && colorCode && shouldShow) {
               const d = document.createElement("div");
               d.textContent = `${part[lang]} – ${colorCode}`;
               list.appendChild(d);
@@ -335,33 +264,32 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function updatePrice(){
-      const cols=new Set(Object.values(selections)).size;
-      let total=Object.keys(selections).reduce((s,id)=>s+(PRICE[id]||0),0);
-      total=cols<=2?Math.min(total,MIX2):Math.min(total,MIXN);
+      const isCamoActive = selections.c1 && selections.c2;
+      let total = 0;
+      if (isCamoActive) {
+          total = CAMO_PRICE;
+      } else {
+          const cols=new Set(Object.values(selections).filter(c => c)).size;
+          total=Object.keys(selections).filter(id => !['c1', 'c2'].includes(id)).reduce((s,id)=>s+(PRICE[id]||0),0);
+          if (cols > 0) {
+            total = cols<=2 ? Math.min(total,MIX2) : Math.min(total,MIXN);
+          }
+      }
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
-      return total;
     }
     
-    function addModelListeners(){
-      document.querySelectorAll(".model-btn").forEach(btn=>{
-         btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
-      });
-    }
+    function addModelListeners(){ document.querySelectorAll(".model-btn").forEach(btn=>{ btn.addEventListener("click",()=>chooseModel(btn.dataset.model)); });}
 
     function chooseModel(model){
-      const overlay=$("model-select");
-      if(overlay)overlay.classList.add("hidden");
+      const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
-      bgIdx=0;
-      changeBg();
-      loadSvg();
+      bgIdx=0; changeBg(); loadSvg();
     }
 
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
     async function savePng(download = false){
-      const cvs=document.createElement("canvas");
-      cvs.width=1600;cvs.height=1200;
+      const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
       const ctx=cvs.getContext("2d");
       ctx.drawImage(await loadImg(BG[bgIdx]),0,0,1600,1200);
       ctx.drawImage(await loadImg(TEXTURE),0,0,1600,1200);
@@ -369,63 +297,43 @@ document.addEventListener("DOMContentLoaded",()=>{
       await Promise.all([...svg.querySelectorAll(".color-overlay")].filter(o=>o.style.fill!=="transparent").map(async ov=>{
         const xml=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg.getAttribute("viewBox")}"><g style="mix-blend-mode:hard-light;opacity:.45">${ov.outerHTML}</g></svg>`;
         const url=URL.createObjectURL(new Blob([xml],{type:"image/svg+xml"}));
-        ctx.drawImage(await loadImg(url),0,0,1600,1200);
-        URL.revokeObjectURL(url);
+        ctx.drawImage(await loadImg(url),0,0,1600,1200); URL.revokeObjectURL(url);
       }));
       if (download) {
-        const a=document.createElement("a");
-        a.href=cvs.toDataURL("image/png");
-        a.download="weapon-wizards.png";
-        a.click();
-      } else {
-        return cvs.toDataURL("image/png");
-      }
+        const a=document.createElement("a"); a.href=cvs.toDataURL("image/png");
+        a.download="weapon-wizards.png"; a.click();
+      } else { return cvs.toDataURL("image/png"); }
     }
     
     async function sendMail(){
       const name = mName.value.trim(), email = mMail.value.trim(), phone = mPhone.value.trim();
-      if(!name || !email){
-        alert(lang === "pl" ? "Proszę podać imię i e-mail." : "Please provide name and e-mail.");
-        return;
-      }
+      if(!name || !email){ alert(lang==="pl"?"Proszę podać imię i e-mail.":"Please provide name and e-mail."); return; }
       const originalBtnText = mSend.textContent;
-      mSend.textContent = lang === 'pl' ? 'Wysyłanie...' : 'Sending...';
-      mSend.disabled = true;
-      modalNote.textContent = lang === 'pl' ? 'Proszę czekać...' : 'Please wait...';
+      mSend.textContent = lang==='pl'?'Wysyłanie...':'Sending...'; mSend.disabled = true;
+      modalNote.textContent = lang==='pl'?'Proszę czekać...':'Please wait...';
       try {
         const imageData = await savePng(false);
         const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('phone', phone);
+        formData.append('name', name); formData.append('email', email); formData.append('phone', phone);
         formData.append('cost', priceBox.textContent);
         let summaryText = "";
         Object.entries(selections).forEach(([partId, colorCode]) => {
             const part = PARTS.find(p => p.id === partId);
-            if (part) summaryText += `${part[lang]} – ${colorCode}\n`;
+            if (part && colorCode) summaryText += `${part[lang]} – ${colorCode}\n`;
         });
-        formData.append('summary', summaryText);
-        formData.append('image', imageData);
-        const response = await fetch('wyslij-mail.php', {
-            method: 'POST',
-            body: formData
-        });
+        formData.append('summary', summaryText); formData.append('image', imageData);
+        const response = await fetch('wyslij-mail.php', { method: 'POST', body: formData });
         const result = await response.json();
         if (result.status === 'success') {
-            modalNote.textContent = lang === 'pl' ? 'Projekt wysłany pomyślnie!' : 'Project sent successfully!';
+            modalNote.textContent = lang==='pl'?'Projekt wysłany pomyślnie!':'Project sent successfully!';
             setTimeout(() => {
-                sendModal.classList.add("hidden");
-                mSend.textContent = originalBtnText;
-                mSend.disabled = false;
+                sendModal.classList.add("hidden"); mSend.textContent = originalBtnText; mSend.disabled = false;
             }, 2000);
-        } else {
-            throw new Error(result.message);
-        }
+        } else { throw new Error(result.message); }
       } catch (error) {
         console.error('Błąd wysyłania:', error);
-        modalNote.textContent = (lang === 'pl' ? 'Błąd wysyłki: ' : 'Sending error: ') + error.message;
-        mSend.textContent = originalBtnText;
-        mSend.disabled = false;
+        modalNote.textContent = (lang==='pl'?'Błąd wysyłki: ':'Sending error: ') + error.message;
+        mSend.textContent = originalBtnText; mSend.disabled = false;
       }
     }
 });
