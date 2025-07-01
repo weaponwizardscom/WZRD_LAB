@@ -23,9 +23,44 @@ body{display:flex;flex-direction:column;justify-content:center;align-items:cente
   .icon-row img{width:120px;height:120px}
   .icon-row{gap:20px}
 }
+
+    /* --- Language selection overlay --- */
+    #lang-select{
+      position:fixed;
+      inset:0;
+      background:#000e;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:24px;
+      z-index:2000;
+    }
+    .lang-btn{
+      width:120px;
+      height:80px;
+      border:3px solid #fff;
+      border-radius:8px;
+      cursor:pointer;
+      transition:.25s;
+      background-size:cover;
+      background-position:center;
+    }
+    .lang-btn:hover{
+      transform:scale(1.1);
+      box-shadow:0 0 12px #fff;
+    }
+
 </style>
 </head>
 <body>
+
+  <!-- Language selection overlay -->
+  <div id="lang-select">
+    <div id="lang-pl" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/pl.svg');"></div>
+    <div id="lang-en" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/gb.svg');"></div>
+  </div>
+
 <!-- PRELOADER -->
 <div id="preload-overlay">
   <div id="preload-box"><div id="preload-bar"></div></div>
@@ -83,5 +118,28 @@ document.addEventListener("DOMContentLoaded",()=>{
   setTimeout(()=> overlay.classList.add("hidden"), 20000);
 });
 </script>
+
+  <script>
+    (function(){
+      const ov=document.getElementById('lang-select');
+      const btnPl=document.getElementById('lang-pl');
+      const btnEn=document.getElementById('lang-en');
+      function choose(lang){
+        localStorage.setItem('lang',lang);
+        ov.style.display='none';
+        // change static text on index page
+        document.getElementById('choose-heading').textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE A FIREARM';
+        document.getElementById('btn-pistol').textContent   = lang==='pl' ? 'PISTOLET' : 'PISTOL';
+        document.getElementById('btn-rifle').textContent    = lang==='pl' ? 'KARABIN' : 'RIFLE';
+        document.getElementById('btn-shotgun').textContent  = lang==='pl' ? 'STRZELBA' : 'SHOTGUN';
+      }
+      btnPl.addEventListener('click',()=>choose('pl'));
+      btnEn.addEventListener('click',()=>choose('en'));
+      // auto-select stored language
+      const stored=localStorage.getItem('lang');
+      if(stored){choose(stored);}
+    })();
+  </script>
+
 </body>
 </html>
