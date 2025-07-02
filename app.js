@@ -120,8 +120,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         "H-332 Purplexed": "#6C4E7C",
         "H-197 Wild Purple": "#845F84",
         "H-122 Gold": "#D4AF37",
-        "H-300 Armor Clear": "#FFFFFF", // Clear
-        "H-311 Covert Clear": "#FFFFFF"  // Clear
+        
     };
     
     /* === STAN === */
