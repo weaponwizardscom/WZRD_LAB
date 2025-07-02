@@ -57,7 +57,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     let selections = {};
     let activePart = null;
     let bgIdx = 0;
-    // *** ZMIANA: Przechowujemy teraz obiekty {hex, code} ***
     let camoSelections = { c1: null, c2: null, c3: null }; 
     let camoTempSelections = [null, null, null]; 
     let camoSelectionIndex = 0; 
@@ -71,7 +70,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
       addModelListeners();
       setLang(lang);
-      chooseModel('glock'); 
+      // *** POPRAWKA: Usunięto automatyczne wywołanie chooseModel('glock') ***
+      // Teraz aplikacja poczeka na wybór użytkownika.
     })();
     
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
@@ -127,7 +127,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       langPl.onclick=()=>setLang("pl"); langEn.onclick=()=>setLang("en");
     }
     
-    // *** ZMIANA: Przekazujemy teraz również kod koloru ***
     function buildCamoPalette() {
         camoPalette.innerHTML = '';
         Object.entries(COLORS).forEach(([full, hex]) => {
@@ -139,7 +138,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         });
     }
 
-    // *** ZMIANA: Obsługa obiektów {hex, code} ***
     function openCamoModal() {
         camoTempSelections[0] = camoSelections.c1; 
         camoTempSelections[1] = camoSelections.c2;
@@ -155,7 +153,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
 
-    // *** ZMIANA: Ustawia tło ORAZ tekst (kod koloru) ***
     function selectCamoColor(colorObject) {
         camoTempSelections[camoSelectionIndex] = colorObject;
         const swatches = [camoSwatch1, camoSwatch2, camoSwatch3];
@@ -237,7 +234,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateSummaryAndPrice();
     }
     
-    // *** ZMIANA: Potwierdzenie i losowanie 3 kolorów ***
     function confirmCamoSelection() {
         const [color1, color2, color3] = camoTempSelections;
         if (color1 && color2 && color3) {
