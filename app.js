@@ -11,6 +11,7 @@ const overlay = createOverlay();
 document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
+    let currentModel = null;
     let currentSvg=null;
     let currentTexture=null;
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
@@ -68,9 +69,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
       addModelListeners();
       setLang(lang);
-      // *** KLUCZOWA POPRAWKA: Wywołanie resetAll() na starcie aplikacji ***
-      resetAll();
-      // Domyślne ładowanie modelu Glock, jeśli żaden nie jest wybrany
       chooseModel('glock'); 
     })();
     
@@ -79,6 +77,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     async function loadSvg(){
       if(!currentSvg)return;
       gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
+      // *** POPRAWKA: Przywrócenie dodawania nakładki do DOM ***
       gunBox.appendChild(overlay);
       const svg=gunBox.querySelector("svg"), layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays"; svg.appendChild(layer);
@@ -88,11 +87,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             const ov=base.cloneNode(true); ov.id=`color-overlay-${n}-${p.id}`;
             ov.classList.add("color-overlay"); layer.appendChild(ov);
         });
-      });
-      // Aplikuj zapisane kolory po załadowaniu SVG
-      Object.entries(selections).forEach(([partId, colorCode]) => {
-          const hex = Object.keys(COLORS).find(key => COLORS[key] === colorCode) ? COLORS[Object.keys(COLORS).find(key => COLORS[key] === colorCode)] : null;
-          if(hex) applyColorToSVG(partId, hex, colorCode);
       });
     }
     
@@ -247,10 +241,16 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
+    // *** POPRAWKA: Przebudowana funkcja resetAll dla pewności działania ***
     function resetAll(){
-      clearCamo();
-      clearSolidColors();
-      activePart=null;
+      // Czyści dane w pamięci
+      selections = {};
+      camoSelections = { c1: null, c2: null };
+      activePart = null;
+      // Czyści wizualnie wszystkie nakładki kolorów, które są aktualnie w DOM
+      document.querySelectorAll(".color-overlay").forEach(o=>{
+        (Array.from(o.tagName==="g"?o.children:[o])).forEach(s=>s.style.fill='transparent');
+      });
       updateSummaryAndPrice();
     }
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
@@ -291,11 +291,15 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
     }
     function chooseModel(model){
+      // Zapobiegaj ponownemu ładowaniu tego samego modelu
+      if (currentModel === model && gunBox.querySelector("svg")) return; 
+      currentModel = model;
+
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       currentTexture = TEXTURES[model] || TEXTURES.glock;
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
-      bgIdx=0; changeBg();
+      bgIdx=-1; changeBg(); // Ustawienie -1, aby changeBg() zaczęło od 0
       resetAll();
       loadSvg();
     }
@@ -308,11 +312,19 @@ document.addEventListener("DOMContentLoaded",()=>{
         ctx.drawImage(await loadImg(currentTexture),0,0,1600,1200);
       }
       const svg=gunBox.querySelector("svg");
-      await Promise.all([...svg.querySelectorAll(".color-overlay")].filter(o=>o.style.fill!=="transparent").map(async ov=>{
-        const xml=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg.getAttribute("viewBox")}"><g style="mix-blend-mode:hard-light;opacity:.45">${ov.outerHTML}</g></svg>`;
-        const url=URL.createObjectURL(new Blob([xml],{type:"image/svg+xml"}));
-        ctx.drawImage(await loadImg(url),0,0,1600,1200); URL.revokeObjectURL(url);
-      }));
+      // Upewnij się, że rysujemy tylko to co jest w stanie 'selections'
+      const activeSelections = Object.keys(selections);
+      for (const partId of activeSelections) {
+          const overlays = [...svg.querySelectorAll(`[id$="-${partId}"].color-overlay`)];
+          for (const ov of overlays) {
+            if (ov.style.fill && ov.style.fill !== 'transparent') {
+                const xml=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${svg.getAttribute("viewBox")}"><g style="mix-blend-mode:hard-light;opacity:.45">${ov.outerHTML}</g></svg>`;
+                const url=URL.createObjectURL(new Blob([xml],{type:"image/svg+xml"}));
+                ctx.drawImage(await loadImg(url),0,0,1600,1200);
+                URL.revokeObjectURL(url);
+            }
+          }
+      }
       if (download) { const a=document.createElement("a"); a.href=cvs.toDataURL("image/png"); a.download="weapon-wizards.png"; a.click(); } 
       else { return cvs.toDataURL("image/png"); }
     }
