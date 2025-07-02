@@ -1,5 +1,4 @@
 /* === OVERLAY CREATOR === */
-// *** POPRAWKA: Dodanie domyślnego tekstu do przycisków ***
 function createOverlay(){
   const ov = document.createElement("div");
   ov.id = "action-overlay";
@@ -35,7 +34,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const summaryList=$("summary-list"), summaryPlaceholder=$("summary-placeholder");
     const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"), sendBtn=$("send-btn");
     const sendModal=$("send-modal"), mSend=$("m-send"), mCancel=$("m-cancel"), mName=$("m-name"), mMail=$("m-mail"), mPhone=$("m-phone"), modalTitle=$("modal-title"), modalNote=$("modal-note");
-    const camoModal=$("camo-modal"), camoPalette=$("camo-palette"), camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"), camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"), camoModalTitle=$("camo-modal-title");
+    const camoModal=$("camo-modal"), camoPalette=$("camo-palette"), camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"), camoSwatch3=$("camo-swatch-3"), camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"), camoModalTitle=$("camo-modal-title");
     const langPl=$("pl"), langEn=$("en"), hParts=$("h-parts"), hCol=$("h-col");
     
     /* === DANE === */
@@ -46,7 +45,9 @@ document.addEventListener("DOMContentLoaded",()=>{
      {id:"zrzut", pl:"Zrzut magazynka", en:"Magazine catch"}, {id:"blokadap", pl:"Blokada zamka", en:"Slide lock"},
      {id:"blokada2", pl:"Zrzut zamka", en:"Slide stop lever"}, {id:"pin", pl:"Pin", en:"Trigger pin"},
      {id:"stopka", pl:"Stopka", en:"Floorplate"}, {id:"plytka", pl:"Płytka", en:"Back plate", disabled:true},
-     {id:"c1", pl:"Wzór 1", en:"Pattern 1"}, {id:"c2", pl:"Wzór 2", en:"Pattern 2"}
+     {id:"c1", pl:"Wzór 1", en:"Pattern 1"}, {id:"c2", pl:"Wzór 2", en:"Pattern 2"},
+     // *** ZMIANA: Dodano nową część c3 ***
+     {id:"c3", pl:"Wzór 3", en:"Pattern 3"}
     ];
     
     const COLORS={/* skrócone */};
@@ -57,9 +58,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     let selections = {};
     let activePart = null;
     let bgIdx = 0;
-    let camoSelections = { c1: null, c2: null };
-    let camoTempSelections = [null, null];
-    let camoSelectionIndex = 0;
+    // *** ZMIANA: Obsługa 3 kolorów kamuflażu ***
+    let camoSelections = { c1: null, c2: null, c3: null }; 
+    let camoTempSelections = [null, null, null]; 
+    let camoSelectionIndex = 0; 
     
     /* === INIT === */
     (async()=>{
@@ -88,12 +90,11 @@ document.addEventListener("DOMContentLoaded",()=>{
             ov.classList.add("color-overlay"); layer.appendChild(ov);
         });
       });
-      // Po załadowaniu SVG, upewnij się, że tekst na nakładce jest poprawny
       setLang(lang);
     }
     
     function buildUI(){
-      PARTS.filter(p => !['c1', 'c2'].includes(p.id)).forEach(p=>{
+      PARTS.filter(p => !['c1', 'c2', 'c3'].includes(p.id)).forEach(p=>{
         const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
         if(p.disabled){ b.classList.add("disabled"); b.disabled=true; }
         else { b.onclick=()=>selectPart(b,p.id); }
@@ -137,20 +138,29 @@ document.addEventListener("DOMContentLoaded",()=>{
             camoPalette.appendChild(sw);
         });
     }
+
+    // *** ZMIANA: Obsługa 3 swatchy podglądu ***
     function openCamoModal() {
-        camoTempSelections[0] = camoSelections.c1; camoTempSelections[1] = camoSelections.c2;
+        camoTempSelections[0] = camoSelections.c1; 
+        camoTempSelections[1] = camoSelections.c2;
+        camoTempSelections[2] = camoSelections.c3;
         camoSwatch1.style.backgroundColor = camoTempSelections[0] || '#333';
         camoSwatch2.style.backgroundColor = camoTempSelections[1] || '#333';
+        camoSwatch3.style.backgroundColor = camoTempSelections[2] || '#333';
         camoSelectionIndex = 0;
         camoModal.classList.remove("hidden");
         camoConfirmBtn.onclick = confirmCamoSelection;
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
+
+    // *** ZMIANA: Logika cykliczna dla 3 kolorów ***
     function selectCamoColor(hex) {
         camoTempSelections[camoSelectionIndex] = hex;
-        (camoSelectionIndex === 0 ? camoSwatch1 : camoSwatch2).style.backgroundColor = hex;
-        camoSelectionIndex = (camoSelectionIndex + 1) % 2;
+        const swatches = [camoSwatch1, camoSwatch2, camoSwatch3];
+        swatches[camoSelectionIndex].style.backgroundColor = hex;
+        camoSelectionIndex = (camoSelectionIndex + 1) % 3; // Cykl 0, 1, 2
     }
+    
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
@@ -162,14 +172,13 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
       if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
       resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
-      // *** POPRAWKA: Ustawienie tekstu dla przycisków na nakładce ***
       const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
       if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
       if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
       mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
       mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
       modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
-      camoModalTitle.textContent=l==='pl'?'Wybierz 2 kolory kamuflażu':'Select 2 camo colors';
+      camoModalTitle.textContent=l==='pl'?'Wybierz 3 kolory kamuflażu':'Select 3 camo colors'; // Zmiana tekstu
       camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
       if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
@@ -188,15 +197,19 @@ document.addEventListener("DOMContentLoaded",()=>{
         if (code) { selections[id] = code; } 
         else { delete selections[id]; }
     }
+
+    // *** ZMIANA: Czyszczenie c3 ***
     function clearCamo() {
-        if (!camoSelections.c1 && !camoSelections.c2) return;
+        if (!camoSelections.c1 && !camoSelections.c2 && !camoSelections.c3) return;
         applyColorToSVG('c1', 'transparent', null);
         applyColorToSVG('c2', 'transparent', null);
-        camoSelections = { c1: null, c2: null };
+        applyColorToSVG('c3', 'transparent', null);
+        camoSelections = { c1: null, c2: null, c3: null };
     }
+
     function clearSolidColors() {
         PARTS.forEach(p => {
-            if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
+            if (!['c1', 'c2', 'c3'].includes(p.id) && selections[p.id]) {
                  applyColorToSVG(p.id, 'transparent', null);
             }
         });
@@ -211,7 +224,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       clearCamo();
       clearSolidColors();
       const keys=Object.keys(COLORS), used=new Set();
-      const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2'].includes(p.id));
+      const partsToMix = PARTS.filter(p=>!p.disabled && !['c1', 'c2', 'c3'].includes(p.id));
       partsToMix.forEach(p=>{
         let pick;
         do{ pick=keys[Math.floor(Math.random()*keys.length)]; }
@@ -221,44 +234,52 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       updateSummaryAndPrice();
     }
+
+    // *** ZMIANA: Potwierdzenie i losowanie 3 kolorów ***
     function confirmCamoSelection() {
-        const [color1, color2] = camoTempSelections;
-        if (color1 && color2) {
+        const [color1, color2, color3] = camoTempSelections;
+        if (color1 && color2 && color3) {
             clearSolidColors();
-            camoSelections.c1 = color1; camoSelections.c2 = color2;
+            camoSelections = { c1: color1, c2: color2, c3: color3 };
             const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
             const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
+            const code3 = Object.keys(COLORS).find(key => COLORS[key] === color3).split(" ")[0];
             applyColorToSVG('c1', color1, code1);
             applyColorToSVG('c2', color2, code2);
+            applyColorToSVG('c3', color3, code3);
             camoModal.classList.add("hidden");
             updateSummaryAndPrice();
         } else {
-            alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
+            alert(lang === 'pl' ? 'Proszę wybrać wszystkie trzy kolory.' : 'Please select all three colors.');
         }
     }
     function mixCamo() {
         clearSolidColors();
         const keys = Object.keys(COLORS);
-        const color1 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
-        const color2 = COLORS[keys[Math.floor(Math.random() * keys.length)]];
-        camoTempSelections = [color1, color2];
+        camoTempSelections = [
+            COLORS[keys[Math.floor(Math.random() * keys.length)]],
+            COLORS[keys[Math.floor(Math.random() * keys.length)]],
+            COLORS[keys[Math.floor(Math.random() * keys.length)]]
+        ];
         confirmCamoSelection();
     }
+    
     function resetAll(){
-      selections = {}; camoSelections = { c1: null, c2: null }; activePart=null;
+      selections = {}; camoSelections = { c1: null, c2: null, c3: null }; activePart=null;
       document.querySelectorAll(".color-overlay").forEach(o=>{
         (Array.from(o.tagName==="g"?o.children:[o])).forEach(s=>s.style.fill='transparent');
       });
       updateSummaryAndPrice();
     }
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
+    
     function updateSummaryAndPrice(){
       summaryList.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
       let hasSelections = false;
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
-          const isCamoPart = ['c1', 'c2'].includes(partId);
+          const isCamoPart = ['c1', 'c2', 'c3'].includes(partId);
           if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
               hasSelections = true;
               const d=document.createElement("div");
@@ -274,7 +295,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if (isCamoActive) {
           total = CAMO_PRICE;
       } else {
-          const solidSelections = Object.keys(selections).filter(id => !['c1', 'c2'].includes(id));
+          const solidSelections = Object.keys(selections).filter(id => !['c1', 'c2', 'c3'].includes(id));
           const cols=new Set(solidSelections.map(id => selections[id])).size;
           total = solidSelections.reduce((s,id)=>s+(PRICE[id]||0),0);
           if (cols > 0) {
@@ -337,7 +358,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         const isCamoActive = !!camoSelections.c1;
         Object.entries(selections).forEach(([partId, colorCode]) => {
             const part = PARTS.find(p => p.id === partId);
-            const isCamoPart = ['c1', 'c2'].includes(partId);
+            const isCamoPart = ['c1', 'c2', 'c3'].includes(partId);
             if (part && colorCode && ((isCamoActive && isCamoPart) || (!isCamoActive && !isCamoPart))) {
                 summaryText += `${part[lang]} – ${colorCode}\n`;
             }
