@@ -1,9 +1,10 @@
 /* === OVERLAY CREATOR === */
+// *** POPRAWKA: Dodanie domyślnego tekstu do przycisków ***
 function createOverlay(){
   const ov = document.createElement("div");
   ov.id = "action-overlay";
   ov.className = "action-overlay hidden";
-  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn"></button><button id="save-overlay" class="overlay-btn"></button>';
+  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn">Zmień tło</button><button id="save-overlay" class="overlay-btn">Zapisz obraz</button>';
   return ov;
 }
 const overlay = createOverlay();
@@ -77,7 +78,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     async function loadSvg(){
       if(!currentSvg)return;
       gunBox.innerHTML = await fetch(currentSvg).then(r=>r.text());
-      // *** POPRAWKA: Przywrócenie dodawania nakładki do DOM ***
       gunBox.appendChild(overlay);
       const svg=gunBox.querySelector("svg"), layer=document.createElementNS("http://www.w3.org/2000/svg","g");
       layer.id="color-overlays"; svg.appendChild(layer);
@@ -88,6 +88,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             ov.classList.add("color-overlay"); layer.appendChild(ov);
         });
       });
+      // Po załadowaniu SVG, upewnij się, że tekst na nakładce jest poprawny
+      setLang(lang);
     }
     
     function buildUI(){
@@ -160,6 +162,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
       if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
       resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
+      // *** POPRAWKA: Ustawienie tekstu dla przycisków na nakładce ***
       const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
       if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
       if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
@@ -241,13 +244,8 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
-    // *** POPRAWKA: Przebudowana funkcja resetAll dla pewności działania ***
     function resetAll(){
-      // Czyści dane w pamięci
-      selections = {};
-      camoSelections = { c1: null, c2: null };
-      activePart = null;
-      // Czyści wizualnie wszystkie nakładki kolorów, które są aktualnie w DOM
+      selections = {}; camoSelections = { c1: null, c2: null }; activePart=null;
       document.querySelectorAll(".color-overlay").forEach(o=>{
         (Array.from(o.tagName==="g"?o.children:[o])).forEach(s=>s.style.fill='transparent');
       });
@@ -291,15 +289,13 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
     }
     function chooseModel(model){
-      // Zapobiegaj ponownemu ładowaniu tego samego modelu
       if (currentModel === model && gunBox.querySelector("svg")) return; 
       currentModel = model;
-
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       currentTexture = TEXTURES[model] || TEXTURES.glock;
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
-      bgIdx=-1; changeBg(); // Ustawienie -1, aby changeBg() zaczęło od 0
+      bgIdx=-1; changeBg();
       resetAll();
       loadSvg();
     }
@@ -312,7 +308,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         ctx.drawImage(await loadImg(currentTexture),0,0,1600,1200);
       }
       const svg=gunBox.querySelector("svg");
-      // Upewnij się, że rysujemy tylko to co jest w stanie 'selections'
       const activeSelections = Object.keys(selections);
       for (const partId of activeSelections) {
           const overlays = [...svg.querySelectorAll(`[id$="-${partId}"].color-overlay`)];
