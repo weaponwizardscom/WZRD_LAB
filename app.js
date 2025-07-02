@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded",()=>{
      {id:"blokada2", pl:"Zrzut zamka", en:"Slide stop lever"}, {id:"pin", pl:"Pin", en:"Trigger pin"},
      {id:"stopka", pl:"Stopka", en:"Floorplate"}, {id:"plytka", pl:"Płytka", en:"Back plate", disabled:true},
      {id:"c1", pl:"Wzór 1", en:"Pattern 1"}, {id:"c2", pl:"Wzór 2", en:"Pattern 2"},
-     // *** ZMIANA: Dodano nową część c3 ***
      {id:"c3", pl:"Wzór 3", en:"Pattern 3"}
     ];
     
@@ -58,7 +57,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     let selections = {};
     let activePart = null;
     let bgIdx = 0;
-    // *** ZMIANA: Obsługa 3 kolorów kamuflażu ***
+    // *** ZMIANA: Przechowujemy teraz obiekty {hex, code} ***
     let camoSelections = { c1: null, c2: null, c3: null }; 
     let camoTempSelections = [null, null, null]; 
     let camoSelectionIndex = 0; 
@@ -128,37 +127,41 @@ document.addEventListener("DOMContentLoaded",()=>{
       langPl.onclick=()=>setLang("pl"); langEn.onclick=()=>setLang("en");
     }
     
+    // *** ZMIANA: Przekazujemy teraz również kod koloru ***
     function buildCamoPalette() {
         camoPalette.innerHTML = '';
         Object.entries(COLORS).forEach(([full, hex]) => {
             const [code, ...rest] = full.split(" "); const name = rest.join(" ");
             const sw = document.createElement("div"); sw.className = "sw"; sw.title = full;
-            sw.onclick = () => selectCamoColor(hex);
+            sw.onclick = () => selectCamoColor({ hex, code });
             sw.innerHTML = `<div class="dot" style="background:${hex}"></div><div class="lbl">${code}<br>${name}</div>`;
             camoPalette.appendChild(sw);
         });
     }
 
-    // *** ZMIANA: Obsługa 3 swatchy podglądu ***
+    // *** ZMIANA: Obsługa obiektów {hex, code} ***
     function openCamoModal() {
         camoTempSelections[0] = camoSelections.c1; 
         camoTempSelections[1] = camoSelections.c2;
         camoTempSelections[2] = camoSelections.c3;
-        camoSwatch1.style.backgroundColor = camoTempSelections[0] || '#333';
-        camoSwatch2.style.backgroundColor = camoTempSelections[1] || '#333';
-        camoSwatch3.style.backgroundColor = camoTempSelections[2] || '#333';
+        const swatches = [camoSwatch1, camoSwatch2, camoSwatch3];
+        swatches.forEach((swatch, i) => {
+            swatch.style.backgroundColor = camoTempSelections[i] ? camoTempSelections[i].hex : '#333';
+            swatch.textContent = camoTempSelections[i] ? camoTempSelections[i].code : '';
+        });
         camoSelectionIndex = 0;
         camoModal.classList.remove("hidden");
         camoConfirmBtn.onclick = confirmCamoSelection;
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
 
-    // *** ZMIANA: Logika cykliczna dla 3 kolorów ***
-    function selectCamoColor(hex) {
-        camoTempSelections[camoSelectionIndex] = hex;
+    // *** ZMIANA: Ustawia tło ORAZ tekst (kod koloru) ***
+    function selectCamoColor(colorObject) {
+        camoTempSelections[camoSelectionIndex] = colorObject;
         const swatches = [camoSwatch1, camoSwatch2, camoSwatch3];
-        swatches[camoSelectionIndex].style.backgroundColor = hex;
-        camoSelectionIndex = (camoSelectionIndex + 1) % 3; // Cykl 0, 1, 2
+        swatches[camoSelectionIndex].style.backgroundColor = colorObject.hex;
+        swatches[camoSelectionIndex].textContent = colorObject.code;
+        camoSelectionIndex = (camoSelectionIndex + 1) % 3;
     }
     
     function setLang(l){
@@ -178,7 +181,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
       mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
       modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
-      camoModalTitle.textContent=l==='pl'?'Wybierz 3 kolory kamuflażu':'Select 3 camo colors'; // Zmiana tekstu
+      camoModalTitle.textContent=l==='pl'?'Wybierz 3 kolory kamuflażu':'Select 3 camo colors';
       camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
       if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
@@ -197,8 +200,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         if (code) { selections[id] = code; } 
         else { delete selections[id]; }
     }
-
-    // *** ZMIANA: Czyszczenie c3 ***
+    
     function clearCamo() {
         if (!camoSelections.c1 && !camoSelections.c2 && !camoSelections.c3) return;
         applyColorToSVG('c1', 'transparent', null);
@@ -234,19 +236,16 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       updateSummaryAndPrice();
     }
-
+    
     // *** ZMIANA: Potwierdzenie i losowanie 3 kolorów ***
     function confirmCamoSelection() {
         const [color1, color2, color3] = camoTempSelections;
         if (color1 && color2 && color3) {
             clearSolidColors();
             camoSelections = { c1: color1, c2: color2, c3: color3 };
-            const code1 = Object.keys(COLORS).find(key => COLORS[key] === color1).split(" ")[0];
-            const code2 = Object.keys(COLORS).find(key => COLORS[key] === color2).split(" ")[0];
-            const code3 = Object.keys(COLORS).find(key => COLORS[key] === color3).split(" ")[0];
-            applyColorToSVG('c1', color1, code1);
-            applyColorToSVG('c2', color2, code2);
-            applyColorToSVG('c3', color3, code3);
+            applyColorToSVG('c1', color1.hex, color1.code);
+            applyColorToSVG('c2', color2.hex, color2.code);
+            applyColorToSVG('c3', color3.hex, color3.code);
             camoModal.classList.add("hidden");
             updateSummaryAndPrice();
         } else {
@@ -256,11 +255,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     function mixCamo() {
         clearSolidColors();
         const keys = Object.keys(COLORS);
-        camoTempSelections = [
-            COLORS[keys[Math.floor(Math.random() * keys.length)]],
-            COLORS[keys[Math.floor(Math.random() * keys.length)]],
-            COLORS[keys[Math.floor(Math.random() * keys.length)]]
-        ];
+        const randomColor = () => {
+            const full = keys[Math.floor(Math.random() * keys.length)];
+            return { hex: COLORS[full], code: full.split(" ")[0] };
+        };
+        camoTempSelections = [randomColor(), randomColor(), randomColor()];
         confirmCamoSelection();
     }
     
