@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
-    const PRICE={zamek:400,szkielet:400,spust:150,lufa:200,zerdz:50,pazur:50,
-                 zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:150};
+    const PRICE={zamek:350,szkielet:350,spust:100,lufa:200,zerdz:50,pazur:50,
+                 zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:100};
     const CAMO_PRICE = 1200;
     const MIX2=800, MIXN=1000;
     
