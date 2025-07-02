@@ -40,32 +40,18 @@ h1{font-size:clamp(22px, 4vw, 32px); margin-bottom: 40px; color: var(--pri); let
   <div id="preload-text">Ładowanie 0%</div>
 </div>
 
-<img src="img/other/logo.png" alt="Weapon Wizards Customs" class="logo">
-<h1 id="choose-heading">WYBIERZ RODZAJ BRONI</h1>
+<img src="img/logo.png" alt="Weapon Wizards Customs" class="logo">
 
 <div class="icon-row">
-  <a id="btn-pistol" href="pistol.html"><img src="img/other/icon_pistol.png" alt="Pistolet"></a>
-  <a id="btn-rifle" href="rifle.html"><img src="img/other/icon_rifle.png" alt="Karabin"></a>
-  <a id="btn-shotgun" href="shotgun.html"><img src="img/other/icon_shotgun.png" alt="Strzelba"></a>
+  <a id="btn-pistol" href="pistol.html"><img src="img/icon_pistol.png" alt="Pistolet"></a>
+  <a id="btn-rifle" href="rifle.html"><img src="img/icon_rifle.png" alt="Karabin"></a>
+  <a id="btn-shotgun" href="shotgun.html"><img src="img/icon_shotgun.png" alt="Strzelba"></a>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
-  const assets=[
-    // Glock Widok 1
-    'img/pistols/glock/01/glock1.png', 'img/pistols/glock/01/g1.png', 'img/pistols/glock/01/g2.png', 'img/pistols/glock/01/g3.png', 'img/pistols/glock/01/g4.png', 'img/pistols/glock/01/g5.png', 'img/pistols/glock/01/g6.png', 'img/pistols/glock/01/g7.png',
-    // Glock Widok 2
-    'img/pistols/glock/02/glock2.png', 'img/pistols/glock/02/g21.png', 'img/pistols/glock/02/g22.png', 'img/pistols/glock/02/g23.png', 'img/pistols/glock/02/g24.png', 'img/pistols/glock/02/g25.png', 'img/pistols/glock/02/g26.png', 'img/pistols/glock/02/g27.png',
-    // Glock Widok 3
-    'img/pistols/glock/03/glock3.png', 'img/pistols/glock/03/g31.png', 'img/pistols/glock/03/g32.png', 'img/pistols/glock/03/g33.png', 'img/pistols/glock/03/g34.png', 'img/pistols/glock/03/g35.png', 'img/pistols/glock/03/g36.png', 'img/pistols/glock/03/g37.png',
-    // CZ
-    'img/pistols/cz/cz.png', 'img/pistols/cz/cz1.png', 'img/pistols/cz/cz2.png', 'img/pistols/cz/cz3.png', 'img/pistols/cz/cz4.png',
-    // Inne
-    'img/other/icon_pistol.png', 'img/other/icon_rifle.png', 'img/other/icon_shotgun.png',
-    // Pliki SVG
-    'g17.svg','sig.svg','cz.svg'
-  ];
-  const total=assets.length, bar=document.getElementById("preload-bar"), text=document.getElementById("preload-text"), overlay=document.getElementById("preload-overlay");
+  const assets=["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png","img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png","img/glock17.png","img/icon_pistol.png","img/icon_rifle.png","img/icon_shotgun.png","g17.svg","sig.svg","cz.svg"];
+  const total=assets.length, bar=$("preload-bar"), text=$("preload-text"), overlay=$("preload-overlay");
   let loaded=0;
   const lang = localStorage.getItem('lang') || 'pl';
   const loadingText = lang === 'pl' ? "Ładowanie" : "Loading";
@@ -75,47 +61,48 @@ document.addEventListener("DOMContentLoaded",()=>{
     bar.style.width=pct+"%"; text.textContent=loadingText + " " + pct+"%";
     if(loaded>=total){overlay.style.display="none";}
   };
-  assets.forEach(src=>{
-      const isSvg = src.endsWith(".svg");
-      if (isSvg) {
-          fetch(src).then(update).catch(update);
-      } else {
-          const i=new Image(); i.onload=update; i.onerror=update; i.src=src;
-      }
-  });
+  assets.forEach(src=>{if(src.endsWith(".svg")){fetch(src).then(update).catch(update);}else{const i=new Image();i.onload=update;i.onerror=update;i.src=src;}});
   window.addEventListener("load",()=>overlay.classList.add("hidden"));
   setTimeout(()=>overlay.classList.add("hidden"),20000);
+  function $(id){return document.getElementById(id);}
 });
 </script>
 
 <script>
   (function(){
     const ov=document.getElementById('lang-select');
-    if (!ov) return;
     const btnPl=document.getElementById('lang-pl');
     const btnEn=document.getElementById('lang-en');
-    const heading = document.getElementById('choose-heading');
 
+    // Funkcja do dynamicznej zmiany języka
     function setLanguage(lang){
+        // Tytuł strony
         document.title = lang === 'pl' ? 'Weapon Wizards – Wybór broni' : 'Weapon Wizards – Choose weapon';
-        if (heading) heading.textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE WEAPON TYPE';
+        // Nagłówek
+        document.getElementById('choose-heading').textContent = lang==='pl' ? 'WYBIERZ RODZAJ BRONI' : 'CHOOSE WEAPON TYPE';
+        // Teksty alternatywne dla obrazków
         document.querySelector('#btn-pistol img').alt = lang === 'pl' ? 'Pistolet' : 'Pistol';
         document.querySelector('#btn-rifle img').alt = lang === 'pl' ? 'Karabin' : 'Rifle';
         document.querySelector('#btn-shotgun img').alt = lang === 'pl' ? 'Strzelba' : 'Shotgun';
     }
+
+    // Funkcja wywoływana po kliknięciu flagi
     function choose(lang){
       localStorage.setItem('lang',lang);
       ov.style.display='none';
-      setLanguage(lang);
+      setLanguage(lang); // Użyj funkcji do zmiany tekstów
+      // LINIĘ location.reload(); USUNIĘTO - TO ROZWIĄZUJE PROBLEM
     }
-    if (btnPl) btnPl.addEventListener('click',()=>choose('pl'));
-    if (btnEn) btnEn.addEventListener('click',()=>choose('en'));
+
+    btnPl.addEventListener('click',()=>choose('pl'));
+    btnEn.addEventListener('click',()=>choose('en'));
     
+    // Funkcja, która od razu ustawia język, jeśli jest zapisany w pamięci
     function applyStoredLanguage(){
       const stored=localStorage.getItem('lang');
       if(stored){
-        ov.style.display='none';
-        setLanguage(stored);
+        ov.style.display='none'; // Ukryj wybór języka
+        setLanguage(stored); // Zastosuj zapisany język
       }
     }
     applyStoredLanguage();
