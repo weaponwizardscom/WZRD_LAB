@@ -67,8 +67,11 @@ document.addEventListener("DOMContentLoaded",()=>{
       overlay.querySelector("#bg-overlay").onclick = changeBg;
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
       addModelListeners();
-      changeBg();
       setLang(lang);
+      // *** KLUCZOWA POPRAWKA: Wywołanie resetAll() na starcie aplikacji ***
+      resetAll();
+      // Domyślne ładowanie modelu Glock, jeśli żaden nie jest wybrany
+      chooseModel('glock'); 
     })();
     
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
@@ -86,7 +89,11 @@ document.addEventListener("DOMContentLoaded",()=>{
             ov.classList.add("color-overlay"); layer.appendChild(ov);
         });
       });
-      setLang(lang);
+      // Aplikuj zapisane kolory po załadowaniu SVG
+      Object.entries(selections).forEach(([partId, colorCode]) => {
+          const hex = Object.keys(COLORS).find(key => COLORS[key] === colorCode) ? COLORS[Object.keys(COLORS).find(key => COLORS[key] === colorCode)] : null;
+          if(hex) applyColorToSVG(partId, hex, colorCode);
+      });
     }
     
     function buildUI(){
@@ -283,14 +290,13 @@ document.addEventListener("DOMContentLoaded",()=>{
          btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
       });
     }
-    // *** KLUCZOWA POPRAWKA: Dodanie resetAll() przy zmianie modelu ***
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       currentTexture = TEXTURES[model] || TEXTURES.glock;
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
       bgIdx=0; changeBg();
-      resetAll(); // Resetuje stan, aby uniknąć "przenoszenia" kolorów
+      resetAll();
       loadSvg();
     }
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
