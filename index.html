@@ -31,8 +31,8 @@ h1{font-size:clamp(22px, 4vw, 32px); margin-bottom: 40px; color: var(--pri); let
 <body>
 
   <div id="lang-select">
-    <div id="lang-pl" class="lang-btn" style="background-image:url('img/other/pl.svg');"></div>
-    <div id="lang-en" class="lang-btn" style="background-image:url('img/other/gb.svg');"></div>
+    <div id="lang-pl" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/pl.svg');"></div>
+    <div id="lang-en" class="lang-btn" style="background-image:url('https://flagicons.lipis.dev/flags/4x3/gb.svg');"></div>
   </div>
 
 <div id="preload-overlay">
@@ -51,20 +51,21 @@ h1{font-size:clamp(22px, 4vw, 32px); margin-bottom: 40px; color: var(--pri); let
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
-  // *** ZMIANA: Zaktualizowana lista zasobów do załadowania z góry ***
   const assets=[
-    // Glock
-    'img/pistols/glock/01/glock1.png', 'img/pistols/glock/01/g1.png', 'img/pistols/glock/01/g2.png', 'img/pistols/glock/01/g3.png',
-    'img/pistols/glock/02/glock2.png', 'img/pistols/glock/02/g21.png', 'img/pistols/glock/02/g22.png',
-    'img/pistols/glock/03/glock3.png', 'img/pistols/glock/03/g31.png',
+    // Glock Widok 1
+    'img/pistols/glock/01/glock1.png', 'img/pistols/glock/01/g1.png', 'img/pistols/glock/01/g2.png', 'img/pistols/glock/01/g3.png', 'img/pistols/glock/01/g4.png', 'img/pistols/glock/01/g5.png', 'img/pistols/glock/01/g6.png', 'img/pistols/glock/01/g7.png',
+    // Glock Widok 2
+    'img/pistols/glock/02/glock2.png', 'img/pistols/glock/02/g21.png', 'img/pistols/glock/02/g22.png', 'img/pistols/glock/02/g23.png', 'img/pistols/glock/02/g24.png', 'img/pistols/glock/02/g25.png', 'img/pistols/glock/02/g26.png', 'img/pistols/glock/02/g27.png',
+    // Glock Widok 3
+    'img/pistols/glock/03/glock3.png', 'img/pistols/glock/03/g31.png', 'img/pistols/glock/03/g32.png', 'img/pistols/glock/03/g33.png', 'img/pistols/glock/03/g34.png', 'img/pistols/glock/03/g35.png', 'img/pistols/glock/03/g36.png', 'img/pistols/glock/03/g37.png',
     // CZ
-    'img/pistols/cz/cz1.png', 'img/pistols/cz/cz2.png', 'img/pistols/cz/cz3.png', 'img/pistols/cz/cz4.png',
+    'img/pistols/cz/cz.png', 'img/pistols/cz/cz1.png', 'img/pistols/cz/cz2.png', 'img/pistols/cz/cz3.png', 'img/pistols/cz/cz4.png',
     // Inne
     'img/other/icon_pistol.png', 'img/other/icon_rifle.png', 'img/other/icon_shotgun.png',
     // Pliki SVG
     'g17.svg','sig.svg','cz.svg'
   ];
-  const total=assets.length, bar=$("preload-bar"), text=$("preload-text"), overlay=$("preload-overlay");
+  const total=assets.length, bar=document.getElementById("preload-bar"), text=document.getElementById("preload-text"), overlay=document.getElementById("preload-overlay");
   let loaded=0;
   const lang = localStorage.getItem('lang') || 'pl';
   const loadingText = lang === 'pl' ? "Ładowanie" : "Loading";
@@ -84,13 +85,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
   window.addEventListener("load",()=>overlay.classList.add("hidden"));
   setTimeout(()=>overlay.classList.add("hidden"),20000);
-  function $(id){return document.getElementById(id);}
 });
 </script>
 
 <script>
   (function(){
     const ov=document.getElementById('lang-select');
+    if (!ov) return;
     const btnPl=document.getElementById('lang-pl');
     const btnEn=document.getElementById('lang-en');
     const heading = document.getElementById('choose-heading');
@@ -102,13 +103,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         document.querySelector('#btn-rifle img').alt = lang === 'pl' ? 'Karabin' : 'Rifle';
         document.querySelector('#btn-shotgun img').alt = lang === 'pl' ? 'Strzelba' : 'Shotgun';
     }
-
     function choose(lang){
       localStorage.setItem('lang',lang);
       ov.style.display='none';
       setLanguage(lang);
     }
-
     if (btnPl) btnPl.addEventListener('click',()=>choose('pl'));
     if (btnEn) btnEn.addEventListener('click',()=>choose('en'));
     
