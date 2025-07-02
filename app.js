@@ -134,7 +134,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             camoPalette.appendChild(sw);
         });
     }
-
     function openCamoModal() {
         camoTempSelections[0] = camoSelections.c1; camoTempSelections[1] = camoSelections.c2;
         camoSwatch1.style.backgroundColor = camoTempSelections[0] || '#333';
@@ -144,13 +143,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoConfirmBtn.onclick = confirmCamoSelection;
         camoCancelBtn.onclick = () => camoModal.classList.add("hidden");
     }
-
     function selectCamoColor(hex) {
         camoTempSelections[camoSelectionIndex] = hex;
         (camoSelectionIndex === 0 ? camoSwatch1 : camoSwatch2).style.backgroundColor = hex;
         camoSelectionIndex = (camoSelectionIndex + 1) % 2;
     }
-    
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
@@ -174,12 +171,10 @@ document.addEventListener("DOMContentLoaded",()=>{
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
       updateSummaryAndPrice();
     }
-    
     function selectPart(btn,id){
       partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
       btn.classList.add("selected"); activePart=id;
     }
-    
     function applyColorToSVG(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
@@ -189,14 +184,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         if (code) { selections[id] = code; } 
         else { delete selections[id]; }
     }
-    
     function clearCamo() {
         if (!camoSelections.c1 && !camoSelections.c2) return;
         applyColorToSVG('c1', 'transparent', null);
         applyColorToSVG('c2', 'transparent', null);
         camoSelections = { c1: null, c2: null };
     }
-
     function clearSolidColors() {
         PARTS.forEach(p => {
             if (!['c1', 'c2'].includes(p.id) && selections[p.id]) {
@@ -204,14 +197,12 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
-
     function applyColor(id, hex, code){
       if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
       clearCamo();
       applyColorToSVG(id, hex, code);
       updateSummaryAndPrice();
     }
-    
     function mix(maxCols){
       clearCamo();
       clearSolidColors();
@@ -224,10 +215,8 @@ document.addEventListener("DOMContentLoaded",()=>{
         used.add(pick.split(" ")[0]);
         applyColorToSVG(p.id,COLORS[pick],pick.split(" ")[0]);
       });
-      // *** KLUCZOWA POPRAWKA: Dodanie brakującej aktualizacji po miksowaniu ***
       updateSummaryAndPrice();
     }
-    
     function confirmCamoSelection() {
         const [color1, color2] = camoTempSelections;
         if (color1 && color2) {
@@ -243,7 +232,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             alert(lang === 'pl' ? 'Proszę wybrać oba kolory.' : 'Please select both colors.');
         }
     }
-
     function mixCamo() {
         clearSolidColors();
         const keys = Object.keys(COLORS);
@@ -252,21 +240,17 @@ document.addEventListener("DOMContentLoaded",()=>{
         camoTempSelections = [color1, color2];
         confirmCamoSelection();
     }
-    
     function resetAll(){
       clearCamo();
       clearSolidColors();
       activePart=null;
       updateSummaryAndPrice();
     }
-    
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
-    
     function updateSummaryAndPrice(){
       summaryList.innerHTML="";
       const isCamoActive = !!camoSelections.c1;
       let hasSelections = false;
-
       Object.entries(selections).forEach(([partId, colorCode]) => {
           const part = PARTS.find(p => p.id === partId);
           const isCamoPart = ['c1', 'c2'].includes(partId);
@@ -277,12 +261,10 @@ document.addEventListener("DOMContentLoaded",()=>{
               summaryList.appendChild(d);
           }
       });
-      
       summaryPlaceholder.style.display = hasSelections ? 'none' : 'flex';
       if (!hasSelections) {
           summaryPlaceholder.textContent = lang === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
       }
-
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
@@ -296,23 +278,21 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
       priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
     }
-    
     function addModelListeners(){
       document.querySelectorAll(".model-btn").forEach(btn=>{
          btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
       });
     }
-
+    // *** KLUCZOWA POPRAWKA: Dodanie resetAll() przy zmianie modelu ***
     function chooseModel(model){
       const overlay=$("model-select"); if(overlay)overlay.classList.add("hidden");
       currentSvg=MODELS[model]||"g17.svg";
       currentTexture = TEXTURES[model] || TEXTURES.glock;
       if(model==="cz"){BG=BG_CZ;}else{BG=BG_DEFAULT;}
       bgIdx=0; changeBg();
-      resetAll();
+      resetAll(); // Resetuje stan, aby uniknąć "przenoszenia" kolorów
       loadSvg();
     }
-
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
     async function savePng(download=false){
       const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
