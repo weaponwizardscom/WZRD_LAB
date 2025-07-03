@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weapon Wizards – Konfigurator</title>
+<style>
+:root{--bg:#000;--txt:#fff;--pri:#00aaff;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;background:var(--bg);color:var(--txt);font-family:Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
+.hidden{display:none !important;}
+.preloader-container{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:3000;flex-direction:column;}
+.preloader-container p{font-size:18px;margin-bottom:24px;color:#888;}
+.spinner{width:40px;height:40px;border:4px solid #444;border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.logo{width:800px;max-width:90vw;height:auto;margin-bottom:40px;}
+.lang-select img{width:60px;margin:0 15px;cursor:pointer;border:3px solid transparent;border-radius:6px;transition:.2s;}
+.lang-select img:hover{transform:scale(1.1);}
+.lang-select img.active{border-color:var(--pri);}
+.icon-row{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;}
+.icon-row a{display:block;border-radius:24px;padding:18px 32px;background:#0f0f0f;color:#fff;text-decoration:none;font-weight:600;transition:.2s;}
+.icon-row a:hover{transform:translateY(-4px);background:#151515;}
+.auth-modal{background:#111;border-radius:12px;padding:32px;box-shadow:0 4px 18px rgba(0,0,0,.6);width:100%;max-width:420px;}
+.auth-modal h1{margin-bottom:24px;font-size:24px;}
+.auth-modal input{width:100%;padding:12px 14px;margin:8px 0;border-radius:6px;border:none;background:#222;color:var(--txt);}
+.auth-modal button{width:100%;padding:12px;margin:12px 0;border:none;border-radius:6px;background:var(--pri);color:#000;font-weight:700;cursor:pointer;transition:.2s;}
+.auth-modal button:hover{opacity:.85;}
+.tabs{display:flex;justify-content:center;margin-bottom:20px;}
+.tabs span{flex:1;padding:12px;cursor:pointer;border-bottom:3px solid transparent;}
+.tabs span.active{border-color:var(--pri);font-weight:700;}
+.auth-divider{margin:18px 0;color:#666;position:relative;}
+.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:#333;}
+.auth-divider::before{left:0;}
+.auth-divider::after{right:0;}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#000;}
+.google-btn img{width:20px;}
+.auth-error{color:#ff6b6b;margin-top:8px;height:20px;font-size:14px;}
+</style>
+</head>
+
+<body>
+
+<!-- ========== PRELOADER ========== -->
+<div id="asset-preloader" class="preloader-container">
+  <div class="spinner"></div>
+  <img src="img/other/logo_full_white.svg" alt="Weapon Wizards Logo" class="logo">
+  <p id="preloader-text" data-translate="loading">Ładowanie zasobów...</p>
+</div>
+
+<!-- ========== WYBÓR JĘZYKA ========== -->
+<div id="lang-preloader" class="preloader-container hidden">
+  <img src="img/other/logo_full_white.svg" alt="Weapon Wizards Logo" class="logo">
+  <p data-translate="choose_language">Wybierz język / Select language</p>
+  <div class="lang-select">
+    <img id="pl-lang" src="https://flagcdn.com/pl.svg" alt="Polski" />
+    <img id="en-lang" src="https://flagcdn.com/gb.svg" alt="English" />
+  </div>
+</div>
+
+<!-- ========== GŁÓWNE MENU ========== -->
+<div id="main-content" class="hidden">
+  <img src="img/other/logo_full_white.svg" alt="Weapon Wizards Customs" class="logo" style="max-width:500px;">
+  <p data-translate="choose_weapon">WYBIERZ RODZAJ BRONI</p>
+  <div class="icon-row">
+    <a id="btn-pistol" href="pistol.html"><img src="img/other/icon_pistol.png" width="64" height="64" alt="Pistolet"><br><span data-translate="pistol">Pistolet</span></a>
+    <a id="btn-rifle" href="rifle.html"><img src="img/other/icon_rifle.png" width="64" height="64" alt="Karabin"><br><span data-translate="rifle">Karabin</span></a>
+    <a id="btn-shotgun" href="shotgun.html"><img src="img/other/icon_shotgun.png" width="64" height="64" alt="Strzelba"><br><span data-translate="shotgun">Strzelba</span></a>
+  </div>
+</div>
+
+<!-- ========== MODAL LOGOWANIA/REJESTRACJI ========== -->
+<div id="auth-modal" class="auth-modal hidden">
+  <div class="tabs">
+    <span id="tab-login" class="active" data-translate="login_tab">Logowanie</span>
+    <span id="tab-register" data-translate="register_tab">Rejestracja</span>
+  </div>
+
+  <!-- LOGOWANIE -->
+  <form id="login-form">
+    <h1 data-translate="welcome_back">Witaj z powrotem!</h1>
+    <input type="email" id="login-email" placeholder="E-mail" data-translate-placeholder="email_placeholder" required>
+    <input type="password" id="login-password" placeholder="Hasło" data-translate-placeholder="password_placeholder" required>
+    <button type="submit" data-translate="login_button">Zaloguj się</button>
+    <p><a href="#" id="forgot-password-link" data-translate="forgot_password">Zapomniałeś hasła?</a></p>
+  </form>
+
+  <!-- REJESTRACJA -->
+  <form id="register-form" class="hidden">
+    <h1 data-translate="create_account">Stwórz konto</h1>
+    <input type="text" id="register-name" placeholder="Imię" data-translate-placeholder="name_placeholder" required>
+    <input type="email" id="register-email" placeholder="E-mail" data-translate-placeholder="email_placeholder" required>
+    <input type="password" id="register-password" placeholder="Hasło (min. 6 znaków)" data-translate-placeholder="password_min_char_placeholder" required>
+    <input type="tel" id="register-phone" placeholder="Telefon (opcjonalnie)" data-translate-placeholder="phone_optional_placeholder">
+    <button type="submit" data-translate="register_button">Zarejestruj się</button>
+  </form>
+
+  <div class="auth-divider" data-translate="or_divider">LUB</div>
+
+  <button id="google-login-btn" class="google-btn">
+    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+    <span data-translate="google_login_button">Zaloguj się z Google</span>
+  </button>
+
+  <p id="auth-error-msg" class="auth-error"></p>
+</div>
+
+<!-- ========== SKRYPTY ========== -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth.js"></script>
+
+</body>
+</html>

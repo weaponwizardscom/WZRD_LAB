@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resetuj Hasło – Weapon Wizards</title>
+    <style>
+        :root{--bg:#000;--txt:#fff;--pri:#00aaff;}
+        body{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
+        .hidden{display:none !important;}
+        .action-box{background:#1b1b1b;padding:24px 32px;border-radius:8px;width:90%;max-width:420px;border-top:4px solid var(--pri);}
+        .auth-logo { max-width: 280px; width: 100%; height: auto; margin-bottom: 30px; }
+        h2{font-size:24px;margin-bottom:8px;}
+        p{margin-bottom:20px; color:#aaa; font-size: 14px;}
+        input{width:100%;padding:12px;margin-bottom:12px;border-radius:6px;border:1px solid #555;background:#000;color:#fff;font-size:16px;}
+        button{width:100%;padding:12px;font-size:16px;border:none;color:#fff;border-radius:6px;cursor:pointer;background:var(--pri);font-weight:700;margin-top:8px;}
+        .message{font-size:14px; margin-top:15px; min-height:20px;}
+        .message.success{color:#28a745;}
+        .message.error{color:#dc3545;}
+    </style>
+</head>
+<body>
+    <div id="action-container" class="action-box">
+        <img src="img/other/logo.png" alt="Weapon Wizards Logo" class="auth-logo">
+        <div id="loading-view">
+            <h2 data-translate="verifying">Weryfikacja...</h2>
+        </div>
+
+        <div id="reset-view" class="hidden">
+            <h2 data-translate="reset_title">Resetuj hasło</h2>
+            <p><span data-translate="for_user">dla</span> <strong id="user-email"></strong></p>
+            <form id="reset-form">
+                <input type="password" id="new-password" required data-translate-placeholder="new_password_placeholder">
+                <button type="submit" data-translate="save_password_btn">Zapisz nowe hasło</button>
+            </form>
+        </div>
+        
+        <p id="message-display" class="message"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="firebase-init.js"></script>
+    <script src="action.js"></script>
+</body>
+</html>

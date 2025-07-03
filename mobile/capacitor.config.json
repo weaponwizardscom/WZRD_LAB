@@ -1,0 +1,7 @@
+{
+  "appId": "com.weaponwizards.wzrdlab",
+  "appName": "WZRD Lab",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {}
+}
