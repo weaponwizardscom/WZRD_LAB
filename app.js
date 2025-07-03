@@ -2,8 +2,8 @@
 function createOverlay(){
   const ov = document.createElement("div");
   ov.id = "action-overlay";
-  ov.className = "action-overlay hidden";
-  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn">Zmień tło</button><button id="save-overlay" class="overlay-btn">Zapisz obraz</button>';
+  ov.className = "action-overlay"; 
+  ov.innerHTML = '<button id="bg-overlay" class="overlay-btn" data-translate="change_bg">Zmień tło</button><button id="save-overlay" class="overlay-btn" data-translate="save_image">Zapisz obraz</button>';
   return ov;
 }
 const overlay = createOverlay();
@@ -11,20 +11,13 @@ const overlay = createOverlay();
 document.addEventListener("DOMContentLoaded",()=>{
 
     /* === KONFIG === */
-    let currentModel = null;
-    let currentSvg=null;
-    let currentTexture=null;
+    let currentModel = null; let currentSvg=null; let currentTexture=null;
     const MODELS={glock:"g17.svg",sig:"sig.svg",cz:"cz.svg"};
-    const TEXTURES = {
-        glock: "img/glock17.png",
-        cz: "img/cz_texture.png",
-        sig: "img/sig_texture.png"
-    };
+    const TEXTURES = { glock: "img/glock17.png", cz: "img/cz_texture.png", sig: "img/sig_texture.png" };
     let BG = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_DEFAULT = ["img/t1.png","img/t2.png","img/t3.png","img/t4.png","img/t5.png","img/t6.png","img/t7.png"];
     const BG_CZ = ["img/cz1.png","img/cz2.png","img/cz3.png","img/cz4.png"];
-    const PRICE={zamek:350,szkielet:350,spust:100,lufa:200,zerdz:50,pazur:50,
-                 zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:100};
+    const PRICE={zamek:350,szkielet:350,spust:100,lufa:200,zerdz:50,pazur:50, zrzut:50,blokadap:50,blokada2:50,pin:50,stopka:100};
     const CAMO_PRICE = 1200;
     const MIX2=800, MIXN=1000;
     
@@ -35,9 +28,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     const viewBtn=$("view-btn"), weaponBtn=$("weapon-btn"), resetBtn=$("reset-btn"), sendBtn=$("send-btn");
     const sendModal=$("send-modal"), mSend=$("m-send"), mCancel=$("m-cancel"), mName=$("m-name"), mMail=$("m-mail"), mPhone=$("m-phone"), modalTitle=$("modal-title"), modalNote=$("modal-note");
     const camoModal=$("camo-modal"), camoPalette=$("camo-palette"), camoSwatch1=$("camo-swatch-1"), camoSwatch2=$("camo-swatch-2"), camoSwatch3=$("camo-swatch-3"), camoConfirmBtn=$("camo-confirm-btn"), camoCancelBtn=$("camo-cancel-btn"), camoModalTitle=$("camo-modal-title");
-    const langPl=$("pl"), langEn=$("en"), hParts=$("h-parts"), hCol=$("h-col");
+    const langPl=$("pl"), langEn=$("en");
     
-    /* === DANE === */
+    /* === DANE i TŁUMACZENIA === */
     const PARTS=[
      {id:"zamek", pl:"Zamek", en:"Slide"}, {id:"szkielet", pl:"Szkielet", en:"Frame"},
      {id:"lufa", pl:"Lufa", en:"Barrel"}, {id:"spust", pl:"Spust", en:"Trigger"},
@@ -49,91 +42,58 @@ document.addEventListener("DOMContentLoaded",()=>{
      {id:"c3", pl:"Wzór 3", en:"Pattern 3"}
     ];
     
-    // *** NOWA, ZAKTUALIZOWANA LISTA KOLORÓW ***
     const COLORS = {
-        "H-140 Bright White": "#E8EBE6",
-        "H-136 Snow White": "#F7F8F3",
-        "H-297 Stormtrooper White": "#EFF1F0",
-        "H-242 Hidden White": "#E6E5E1",
-        "H-312 Frost": "#C9C8C6",
-        "H-151 Satin Aluminum": "#C0C0C0",
-        "H-255 Crushed Silver": "#AEB2B5",
-        "H-152 Stainless": "#A9A9A9",
-        "H-306 Springfield Grey": "#A2A4A6",
-        "H-262 Stone Grey": "#9F9E99",
-        "H-265 Cold War Grey": "#8D918D",
-        "H-227 Tactical Grey": "#8C8A81",
-        "H-170 Titanium": "#908C86",
-        "H-237 Tungsten": "#6A6B6E",
-        "H-130 Combat Grey": "#6A6A6A",
-        "H-188 Magpul Stealth Grey": "#45484B",
-        "H-210 Sig Dark Grey": "#5B5E5E",
-        "H-234 Sniper Grey": "#5B6063",
-        "H-213 Battleship Grey": "#52595D",
-        "H-146 Graphite Black": "#474748",
-        "H-190 Armor Black": "#464647",
-        "H-127 Kel-Tec Navy Blue": "#455562",
-        "H-362 Patriot Blue": "#33415C",
-        "H-171 NRA Blue": "#3E5164",
-        "H-258 Socom Blue": "#3B4B5A",
-        "H-238 Midnight Blue": "#484B56",
-        "H-245 Socom Black": "#1C1C1C", // Alias, H-235 to Coyote Tan
-        "H-294 Midnight Black": "#111111",
-        "H-142 Light Sand": "#DAC5A2",
-        "H-199 Desert Sand": "#A38F7B",
-        "H-30372 FS Brown Sand": "#7B6F63",
-        "H-33446 FS Sabre Sand": "#B19672",
-        "H-265 Flat Dark Earth": "#7A6D5A",
-        "H-8000 RAL 8000": "#8B7355",
-        "H-250 A.I. Dark Earth": "#7D6A54",
-        "H-268 Troy Coyote Tan": "#7B6A4C",
-        "H-148 Burnt Bronze": "#6D5947",
-        "H-293 Vortex Bronze": "#7E6650",
-        "H-226 Patriot Brown": "#4B443D",
-        "H-269 Barrett Brown": "#67594D",
-        "H-149 Copper Brown": "#8B4513",
-        "H-339 Federal Brown": "#5E5044",
-        "H-34094 Green": "#344033",
-        "H-248 Forest Green": "#404C3D",
-        "H-200 Highland Green": "#4B5344",
-        "H-189 Noveske Bazooka Green": "#726D54",
-        "H-344 Olive": "#6B6543",
-        "H-229 Sniper Green": "#565A4B",
-        "H-240 Mil Spec O.D. Green": "#5F604F",
-        "H-231 Magpul Foliage Green": "#6C7164",
-        "H-247 Desert Sage": "#6A6B5C",
-        "H-305 Jesse James Eastern Front Green": "#555849",
-        "H-353 Island Green": "#00887A",
-        "H-316 Squatch Green": "#006A4E",
-        "H-331 Parakeet Green": "#C2D94B",
-        "H-354 Lemon Zest": "#F7D51D",
-        "H-144 Corvette Yellow": "#FDE135",
-        "H-317 Sunflower": "#F9A602",
-        "H-128 Hunter Orange": "#E85F47",
-        "H-167 USMC Red": "#B24645",
-        "H-216 S&W Red": "#B70101",
-        "H-221 Crimson": "#891F2B",
-        "H-141 Prison Pink": "#DF88A7",
-        "H-224 Sig Pink": "#E6C9C4",
-        "H-321 Blush": "#D8C0C4",
-        "H-357 Periwinkle": "#6B6EA6",
-        "H-332 Purplexed": "#6C4E7C",
-        "H-197 Wild Purple": "#845F84",
-        "H-122 Gold": "#D4AF37",
-        
+        "H-140 Bright White": "#E8EBE6", "H-136 Snow White": "#F7F8F3", "H-297 Stormtrooper White": "#EFF1F0", "H-242 Hidden White": "#E6E5E1", "H-312 Frost": "#C9C8C6", "H-151 Satin Aluminum": "#C0C0C0", "H-255 Crushed Silver": "#AEB2B5", "H-152 Stainless": "#A9A9A9", "H-306 Springfield Grey": "#A2A4A6", "H-262 Stone Grey": "#9F9E99", "H-265 Cold War Grey": "#8D918D", "H-227 Tactical Grey": "#8C8A81", "H-170 Titanium": "#908C86", "H-237 Tungsten": "#6A6B6E", "H-130 Combat Grey": "#6A6A6A", "H-188 Magpul Stealth Grey": "#45484B", "H-210 Sig Dark Grey": "#5B5E5E", "H-234 Sniper Grey": "#5B6063", "H-213 Battleship Grey": "#52595D", "H-146 Graphite Black": "#474748", "H-190 Armor Black": "#464647", "H-127 Kel-Tec Navy Blue": "#455562", "H-362 Patriot Blue": "#33415C", "H-171 NRA Blue": "#3E5164", "H-258 Socom Blue": "#3B4B5A", "H-238 Midnight Blue": "#484B56", "H-245 Socom Black": "#1C1C1C", "H-294 Midnight Black": "#111111", "H-142 Light Sand": "#DAC5A2", "H-199 Desert Sand": "#A38F7B", "H-30372 FS Brown Sand": "#7B6F63", "H-33446 FS Sabre Sand": "#B19672", "H-265 Flat Dark Earth": "#7A6D5A", "H-8000 RAL 8000": "#8B7355", "H-250 A.I. Dark Earth": "#7D6A54", "H-268 Troy Coyote Tan": "#7B6A4C", "H-148 Burnt Bronze": "#6D5947", "H-293 Vortex Bronze": "#7E6650", "H-226 Patriot Brown": "#4B443D", "H-269 Barrett Brown": "#67594D", "H-149 Copper Brown": "#8B4513", "H-339 Federal Brown": "#5E5044", "H-34094 Green": "#344033", "H-248 Forest Green": "#404C3D", "H-200 Highland Green": "#4B5344", "H-189 Noveske Bazooka Green": "#726D54", "H-344 Olive": "#6B6543", "H-229 Sniper Green": "#565A4B", "H-240 Mil Spec O.D. Green": "#5F604F", "H-231 Magpul Foliage Green": "#6C7164", "H-247 Desert Sage": "#6A6B5C", "H-305 Jesse James Eastern Front Green": "#555849", "H-353 Island Green": "#00887A", "H-316 Squatch Green": "#006A4E", "H-331 Parakeet Green": "#C2D94B", "H-354 Lemon Zest": "#F7D51D", "H-144 Corvette Yellow": "#FDE135", "H-317 Sunflower": "#F9A602", "H-128 Hunter Orange": "#E85F47", "H-167 USMC Red": "#B24645", "H-216 S&W Red": "#B70101", "H-221 Crimson": "#891F2B", "H-141 Prison Pink": "#DF88A7", "H-224 Sig Pink": "#E6C9C4", "H-321 Blush": "#D8C0C4", "H-357 Periwinkle": "#6B6EA6", "H-332 Purplexed": "#6C4E7C", "H-197 Wild Purple": "#845F84", "H-122 Gold": "#D4AF37",
+    };
+    
+    const translations = {
+        pl: {
+            my_profile: "Mój Profil", logout: "Wyloguj", change_bg: "Zmień tło", save_image: "Zapisz obraz",
+            loading: "Ładowanie...", select_part: "1. Wybierz część", select_color: "2. Wybierz kolor (Cerakote)",
+            change_view: "Zmień widok", change_weapon: "Zmień broń", reset_colors: "Resetuj kolory",
+            consult_project: "Skonsultuj projekt z Wizards", send_project_title: "Wyślij projekt",
+            name_placeholder: "Imię", email_placeholder: "E-mail", phone_placeholder: "Telefon",
+            send_btn: "Wyślij", cancel_btn: "Anuluj", send_note: "Twój projekt zostanie wysłany automatycznie.",
+            camo_select_title: "Wybierz 3 kolory kamuflażu", confirm_btn: "Zatwierdź",
+            summary_placeholder: "W tym miejscu pojawią się wybrane przez Ciebie kolory.",
+            cost_label: "Szacowany koszt:"
+        },
+        en: {
+            my_profile: "My Profile", logout: "Logout", change_bg: "Change background", save_image: "Save image",
+            loading: "Loading...", select_part: "1. Select part", select_color: "2. Select colour (Cerakote)",
+            change_view: "Change view", change_weapon: "Change weapon", reset_colors: "Reset colours",
+            consult_project: "Consult the project with Wizards", send_project_title: "Send project",
+            name_placeholder: "Name", email_placeholder: "E-mail", phone_placeholder: "Phone",
+            send_btn: "Send", cancel_btn: "Cancel", send_note: "Your project will be sent automatically.",
+            camo_select_title: "Select 3 camo colors", confirm_btn: "Confirm",
+            summary_placeholder: "Your chosen colors will appear here.",
+            cost_label: "Estimated cost:"
+        }
     };
     
     /* === STAN === */
     let lang = localStorage.getItem("lang") || "pl";
-    let selections = {};
-    let activePart = null;
-    let bgIdx = 0;
+    let selections = {}; let activePart = null; let bgIdx = 0;
     let camoSelections = { c1: null, c2: null, c3: null }; 
-    let camoTempSelections = [null, null, null]; 
-    let camoSelectionIndex = 0; 
+    let camoTempSelections = [null, null, null]; let camoSelectionIndex = 0; 
     
     /* === INIT === */
     (async()=>{
+      if (window.firebaseAuth) {
+        const auth = window.firebaseAuth;
+        auth.onAuthStateChanged(user => {
+          if (user) {
+            const userNameDisplay = document.getElementById('user-name-display');
+            if (userNameDisplay) userNameDisplay.textContent = user.displayName;
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) logoutBtn.addEventListener('click', () => auth.signOut());
+            const mNameInput = document.getElementById('m-name');
+            const mMailInput = document.getElementById('m-mail');
+            if(mNameInput) mNameInput.value = user.displayName || '';
+            if(mMailInput) mMailInput.value = user.email || '';
+          }
+        });
+      }
       await preloadBGs();
       buildUI();
       buildCamoPalette();
@@ -141,7 +101,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       overlay.querySelector("#save-overlay").onclick = ()=>savePng(true);
       addModelListeners();
       setLang(lang);
-      chooseModel('glock'); 
     })();
     
     function preloadBGs(){ BG.forEach(src=>{const i=new Image();i.src=src;}); }
@@ -163,11 +122,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     
     function buildUI(){
-      partsBox.innerHTML = ''; 
-      palette.innerHTML = ''; 
-
+      partsBox.innerHTML = ''; palette.innerHTML = ''; 
       PARTS.filter(p => !['c1', 'c2', 'c3'].includes(p.id)).forEach(p=>{
-        const b=document.createElement("button"); b.textContent=p[lang]; b.dataset.id=p.id;
+        const b=document.createElement("button"); b.dataset.id=p.id;
         if(p.disabled){ b.classList.add("disabled"); b.disabled=true; }
         else { b.onclick=()=>selectPart(b,p.id); }
         partsBox.appendChild(b);
@@ -236,31 +193,31 @@ document.addEventListener("DOMContentLoaded",()=>{
     
     function setLang(l){
       lang=l; localStorage.setItem('lang', l);
+      document.documentElement.lang = l;
       document.title = l==="pl"?"Weapon-Wizards – Pistolet":"Weapon-Wizards – Pistol";
-      const loadingText=$('loading-text'); if(loadingText) loadingText.textContent=l==='pl'?'Ładowanie...':'Loading...';
+      
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.dataset.translate;
+        if(translations[l] && translations[l][key]) el.textContent = translations[l][key];
+      });
+       document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+        const key = el.dataset.translatePlaceholder;
+        if(translations[l] && translations[l][key]) el.placeholder = translations[l][key];
+      });
+      
       partsBox.querySelectorAll("button:not(.mix):not(.camo-alpha):not(.mix-camo):not(.camo-charlie)").forEach(b=>{
         const p=PARTS.find(x=>x.id===b.dataset.id); if(p) b.textContent=p[lang];
       });
-      hParts.textContent=l==="pl"?"1. Wybierz część":"1. Select part"; hCol.textContent=l==="pl"?"2. Wybierz kolor (Cerakote)":"2. Select colour (Cerakote)";
-      if(viewBtn) viewBtn.textContent=l==="pl"?"Zmień widok":"Change view";
-      if(weaponBtn) weaponBtn.textContent=l==="pl"?"Zmień broń":"Change weapon";
-      resetBtn.textContent=l==="pl"?"Resetuj kolory":"Reset colours"; sendBtn.textContent=l==="pl"?"Wyślij do Wizards!":"Send to Wizards!";
-      const bgOverlay=$("bg-overlay"), saveOverlay=$("save-overlay");
-      if(bgOverlay) bgOverlay.textContent=l==="pl"?"Zmień tło":"Change background";
-      if(saveOverlay) saveOverlay.textContent=l==="pl"?"Zapisz obraz":"Save image";
-      mSend.textContent=l==="pl"?"Wyślij":"Send"; mCancel.textContent=l==="pl"?"Anuluj":"Cancel";
-      mName.placeholder=l==="pl"?"Imię":"Name"; mMail.placeholder=l==="pl"?"E-mail":"E-mail"; mPhone.placeholder=l==="pl"?"Telefon":"Phone";
-      modalTitle.textContent=l==="pl"?"Wyślij projekt":"Send project"; modalNote.textContent=l==="pl"?"Twój projekt zostanie wysłany automatycznie.":"Your project will be sent automatically.";
-      camoModalTitle.textContent=l==='pl'?'Wybierz 3 kolory kamuflażu':'Select 3 camo colors';
-      camoConfirmBtn.textContent=l==='pl'?'Zatwierdź':'Confirm'; camoCancelBtn.textContent=l==='pl'?'Anuluj':'Cancel';
-      if(summaryPlaceholder) summaryPlaceholder.textContent = l === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
+      
       langPl.classList.toggle("active",l==="pl"); langEn.classList.toggle("active",l==="en");
       updateSummaryAndPrice();
     }
+
     function selectPart(btn,id){
       partsBox.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
       btn.classList.add("selected"); activePart=id;
     }
+
     function applyColorToSVG(id, hex, code) {
         if (!id) return;
         ["1","2"].forEach(n=>{
@@ -286,12 +243,14 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
+
     function applyColor(id, hex, code){
-      if(!id){ alert(lang==="pl"?"Najpierw wybierz część":"Select a part first"); return; }
+      if(!id){ alert(translations[lang].select_part_alert || "Najpierw wybierz część"); return; }
       clearCamo();
       applyColorToSVG(id, hex, code);
       updateSummaryAndPrice();
     }
+
     function mix(maxCols){
       clearCamo();
       clearSolidColors();
@@ -318,9 +277,10 @@ document.addEventListener("DOMContentLoaded",()=>{
             camoModal.classList.add("hidden");
             updateSummaryAndPrice();
         } else {
-            alert(lang === 'pl' ? 'Proszę wybrać wszystkie trzy kolory.' : 'Please select all three colors.');
+            alert(translations[lang].camo_select_3_colors_alert || 'Proszę wybrać wszystkie trzy kolory.');
         }
     }
+
     function mixCamo() {
         clearSolidColors();
         const keys = Object.keys(COLORS);
@@ -339,6 +299,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       updateSummaryAndPrice();
     }
+
     function changeBg(){ bgIdx=(bgIdx+1)%BG.length; gunBox.style.backgroundImage=`url('${BG[bgIdx]}')`; }
     
     function updateSummaryAndPrice(){
@@ -356,9 +317,7 @@ document.addEventListener("DOMContentLoaded",()=>{
           }
       });
       summaryPlaceholder.style.display = hasSelections ? 'none' : 'flex';
-      if (!hasSelections) {
-          summaryPlaceholder.textContent = lang === 'pl' ? 'W tym miejscu pojawią się wybrane przez Ciebie kolory.' : 'Your chosen colors will appear here.';
-      }
+      
       let total = 0;
       if (isCamoActive) {
           total = CAMO_PRICE;
@@ -370,13 +329,15 @@ document.addEventListener("DOMContentLoaded",()=>{
             total = cols<=2 ? Math.min(total,MIX2) : Math.min(total,MIXN);
           }
       }
-      priceBox.innerHTML=(lang==="pl"?"Szacowany koszt:&nbsp;&nbsp;":"Estimated cost:&nbsp;&nbsp;")+total+"&nbsp;zł";
+      priceBox.innerHTML=`<span data-translate="cost_label">${translations[lang].cost_label}</span>&nbsp;&nbsp;`+total+"&nbsp;zł";
     }
+
     function addModelListeners(){
       document.querySelectorAll(".model-btn").forEach(btn=>{
          btn.addEventListener("click",()=>chooseModel(btn.dataset.model));
       });
     }
+
     function chooseModel(model){
       if (currentModel === model && gunBox.querySelector("svg")) return; 
       currentModel = model;
@@ -388,6 +349,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       resetAll();
       loadSvg();
     }
+
     const loadImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=s;});
     async function savePng(download=false){
       const cvs=document.createElement("canvas"); cvs.width=1600; cvs.height=1200;
@@ -412,12 +374,13 @@ document.addEventListener("DOMContentLoaded",()=>{
       if (download) { const a=document.createElement("a"); a.href=cvs.toDataURL("image/png"); a.download="weapon-wizards.png"; a.click(); } 
       else { return cvs.toDataURL("image/png"); }
     }
+    
     async function sendMail(){
       const name = mName.value.trim(), email = mMail.value.trim(), phone = mPhone.value.trim();
-      if(!name || !email){ alert(lang==="pl"?"Proszę podać imię i e-mail.":"Please provide name and e-mail."); return; }
+      if(!name || !email){ alert(translations[lang].send_error_name_email || "Proszę podać imię i e-mail."); return; }
       const originalBtnText = mSend.textContent;
-      mSend.textContent = lang==='pl'?'Wysyłanie...':'Sending...'; mSend.disabled = true;
-      modalNote.textContent = lang==='pl'?'Proszę czekać...':'Please wait...';
+      mSend.textContent = translations[lang].sending_in_progress || 'Wysyłanie...'; mSend.disabled = true;
+      modalNote.textContent = translations[lang].please_wait || 'Proszę czekać...';
       try {
         const imageData = await savePng(false); const formData = new FormData();
         formData.append('name', name); formData.append('email', email); formData.append('phone', phone);
@@ -435,12 +398,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         const response = await fetch('wyslij-mail.php', { method: 'POST', body: formData });
         const result = await response.json();
         if (result.status === 'success') {
-            modalNote.textContent = lang==='pl'?'Projekt wysłany pomyślnie!':'Project sent successfully!';
+            modalNote.textContent = translations[lang].send_success || 'Projekt wysłany pomyślnie!';
             setTimeout(() => { sendModal.classList.add("hidden"); mSend.textContent = originalBtnText; mSend.disabled = false; }, 2000);
         } else { throw new Error(result.message); }
       } catch (error) {
         console.error('Błąd wysyłania:', error);
-        modalNote.textContent = (lang==='pl'?'Błąd wysyłki: ':'Sending error: ') + error.message;
+        modalNote.textContent = (translations[lang].send_error || 'Błąd wysyłki: ') + error.message;
         mSend.textContent = originalBtnText; mSend.disabled = false;
       }
     }
