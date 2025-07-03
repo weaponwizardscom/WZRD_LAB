@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mój Profil – Weapon Wizards</title>
+    <style>
+        :root{--bg:#000;--txt:#fff;--pri:#00aaff;--success: #28a745; --error: #dc3545;}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);}
+        .hidden{display:none !important;}
+        #app-header{width:100%;padding:10px 0;border-bottom:1px solid #333;}
+        .header-content{position:relative;width:100%;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;justify-content:center;align-items:center;}
+        #header-logo{height:70px;}
+        .user-profile{position:absolute;right:24px;display:flex;align-items:center;gap:15px;}
+        #user-name-display{font-weight:bold;}
+        #profile-btn{color:#ccc;text-decoration:none;font-size:14px;font-weight:600;}
+        #profile-btn:hover{color:var(--pri);}
+        #logout-btn{padding:8px 16px;font-size:14px;background-color:var(--pri);border:none;color:white;border-radius:5px;cursor:pointer;}
+        #logout-btn:hover{filter:brightness(1.2);}
+        
+        .page-wrapper{display:flex;justify-content:center;padding:40px 20px;}
+        .profile-container{display:flex;flex-direction:column;gap:30px;width:100%;max-width:600px;}
+        .profile-box{background:#1b1b1b;padding:24px 32px;border-radius:8px;border-top:4px solid var(--pri);}
+        h2{font-size:22px;margin-bottom:20px;}
+        .form-group{margin-bottom:15px;}
+        label{display:block;font-size:14px;color:#aaa;margin-bottom:5px;text-align:left;}
+        input{width:100%;padding:12px;border-radius:6px;border:1px solid #555;background:#000;color:#fff;font-size:16px;}
+        input:disabled{background:#333;color:#888;}
+        .profile-box button, .btn-red {display:inline-block; text-decoration: none; width:auto;padding:10px 20px;font-size:16px;border:none;color:#fff;border-radius:6px;cursor:pointer;background:var(--pri);font-weight:700;margin-top:8px;}
+        .btn-red { background: var(--error); }
+        .message{font-size:14px;margin-top:15px;min-height:20px;font-weight:bold;}
+        .message.success{color:var(--success);}
+        .message.error{color:var(--error);}
+        .modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:2000;}
+        .btn-secondary { background: #6c757d; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<header id="app-header" class="hidden">
+    <div class="header-content">
+      <a href="index.html"><img id="header-logo" src="img/other/pasek.png" alt="WZRD LAB"></a>
+      <div class="user-profile">
+        <span id="user-name-display">Wczytywanie...</span>
+        <a href="profile.html" id="profile-btn" data-translate="my_profile">Mój Profil</a>
+        <button id="logout-btn" data-translate="logout">Wyloguj</button>
+      </div>
+    </div>
+</header>
+
+<main id="profile-page" class="page-wrapper hidden">
+    <div class="profile-container">
+        <div class="profile-box">
+            <h2 data-translate="your_data">Twoje dane</h2>
+            <form id="update-details-form">
+                <div class="form-group">
+                    <label for="profile-name" data-translate="name_label">Imię / Nazwa</label>
+                    <input type="text" id="profile-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-email" data-translate="email_label">E-mail</label>
+                    <input type="email" id="profile-email" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="profile-phone" data-translate="phone_label">Telefon</label>
+                    <input type="tel" id="profile-phone">
+                </div>
+                <button type="submit" data-translate="save_changes">Zapisz zmiany</button>
+                <p id="details-message" class="message"></p>
+            </form>
+        </div>
+
+        <div class="profile-box">
+            <h2 data-translate="change_password_title">Zmiana hasła</h2>
+            <form id="update-password-form">
+                <div class="form-group">
+                    <label for="profile-new-password" data-translate="new_password_label">Nowe hasło</label>
+                    <input type="password" id="profile-new-password" required minlength="6">
+                </div>
+                <button type="submit" data-translate="change_password_btn">Zmień hasło</button>
+                <p id="password-message" class="message"></p>
+            </form>
+        </div>
+        
+        <button type="button" id="return-btn" class="btn-red" data-translate="return_btn" style="text-align:center; width: 100%;">Powrót</button>
+    </div>
+</main>
+
+<div id="reauth-modal" class="modal hidden">
+    <div class="profile-box" style="max-width: 450px; text-align: center;">
+        <h2 data-translate="reauth_title">Potwierdź swoją tożsamość</h2>
+        <p data-translate="reauth_prompt" style="color: #ccc; text-align: center;">Aby kontynuować, wpisz swoje obecne hasło.</p>
+        <form id="reauth-form">
+            <div class="form-group">
+                <label for="reauth-password" data-translate="password_label" style="text-align: left;">Obecne hasło</label>
+                <input type="password" id="reauth-password" required>
+            </div>
+            <button type="submit" data-translate="confirm_btn">Potwierdź</button>
+            <button type="button" id="reauth-cancel-btn" class="btn-secondary" data-translate="cancel_btn">Anuluj</button>
+        </form>
+        <p id="reauth-message" class="message"></p>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-guard.js"></script>
+<script src="profile.js"></script>
+</body>
+</html>

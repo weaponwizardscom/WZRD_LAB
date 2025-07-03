@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Weapon Wizards – Konfigurator</title>
+<style>
+:root{--bg:#000;--txt:#fff;--pri:#00aaff;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;background:var(--bg);color:var(--txt);font-family:Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px;}
+.hidden{display:none !important;}
+.preloader-container{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:3000;flex-direction:column;}
+.preloader-container p{font-size:18px;margin-bottom:24px;color:#888;}
+.spinner{width:40px;height:40px;border:4px solid #444;border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.logo{width:800px;max-width:90vw;height:auto;margin-bottom:40px;}
+.auth-logo{max-width:280px;width:100%;height:auto;margin-bottom:30px;}
+.lang-select img{width:60px;margin:0 15px;cursor:pointer;border:3px solid transparent;border-radius:6px;transition:.2s;}
+.lang-select img:hover{transform:scale(1.1);}
+.lang-select img.active{border-color:var(--pri);}
+.icon-row{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;}
+.icon-row a{display:block;border-radius:24px;padding:18px 32px;background:#0f0f0f;color:#fff;text-decoration:none;font-weight:600;transition:.2s;}
+.icon-row a:hover{transform:translateY(-4px);background:#151515;}
+.auth-card{background:#111;border-radius:12px;padding:32px;box-shadow:0 4px 18px rgba(0,0,0,.6);width:100%;max-width:420px;}
+.auth-card h1{margin-bottom:24px;font-size:24px;}
+.auth-card input{width:100%;padding:12px 14px;margin:8px 0;border-radius:6px;border:none;background:#222;color:var(--txt);}
+.auth-card button{width:100%;padding:12px;margin:12px 0;border:none;border-radius:6px;background:var(--pri);color:#000;font-weight:700;cursor:pointer;transition:.2s;}
+.auth-card button:hover{opacity:.85;}
+.auth-divider{margin:18px 0;color:#666;position:relative;}
+.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:#333;}
+.auth-divider::before{left:0;}
+.auth-divider::after{right:0;}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#000;}
+.google-btn img{width:20px;}
+.auth-error{color:#ff6b6b;margin-top:8px;height:20px;font-size:14px;}
+</style>
+</head>
+
+<body>
+
+<!-- PRELOADER -->
+<div id="asset-preloader" class="preloader-container">
+  <div class="spinner"></div>
+  <img src="img/other/logo_full_white.svg" alt="Weapon Wizards Logo" class="logo">
+  <p id="preloader-text" data-translate="loading">Ładowanie...</p>
+  <div class="lang-select">
+    <img id="lang-pl" src="https://flagcdn.com/pl.svg" alt="Polski" />
+    <img id="lang-en" src="https://flagcdn.com/gb.svg" alt="English" />
+  </div>
+</div>
+
+<!-- AUTH SCREENS -->
+<div id="auth-container" class="hidden">
+  <img src="img/other/logo_full_white.svg" alt="Weapon Wizards Logo" class="auth-logo">
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Email" required data-translate-placeholder="email_placeholder">
+      <input type="password" id="login-password" placeholder="Hasło" required data-translate-placeholder="password_placeholder">
+      <button type="submit" class="auth-btn" data-translate="login_button">Zaloguj się</button>
+    </form>
+    <p><a href="#" id="show-register" data-translate="go_to_register">Nie masz konta? Zarejestruj się.</a></p>
+    <div class="auth-divider" data-translate="or_divider">LUB</div>
+    <button id="google-login-btn" class="google-btn" data-translate="google_login_button">
+      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+      Zaloguj się z Google
+    </button>
+    <p id="auth-error-msg" class="auth-error"></p>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="register-screen" class="hidden">
+    <form id="register-form">
+      <input type="email" id="register-email" placeholder="Email" required data-translate-placeholder="email_placeholder">
+      <input type="password" id="register-password" placeholder="Hasło (min. 6 znaków)" required data-translate-placeholder="password_min_char_placeholder">
+      <input type="tel" id="register-phone" placeholder="Telefon (opcjonalnie)" data-translate-placeholder="phone_optional_placeholder">
+      <button type="submit" class="auth-btn" data-translate="register_button">Zarejestruj się</button>
+    </form>
+    <p><a href="#" id="show-login" data-translate="go_to_login">Masz konto? Zaloguj się.</a></p>
+    <div class="auth-divider" data-translate="or_divider">LUB</div>
+    <button id="google-register-btn" class="google-btn" data-translate="google_login_button">
+      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+      Zarejestruj się z Google
+    </button>
+    <p id="auth-error-msg-register" class="auth-error"></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth.js"></script>
+
+</body>
+</html>
